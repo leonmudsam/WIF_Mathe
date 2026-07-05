@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Karteikasten · Wirtschaftsmathematik</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16233F;
+    --ink-soft:#3A4A6B;
+    --paper:#EFF1EA;
+    --paper-line:#DADCD2;
+    --card:#FFFFFF;
+    --line:#DBDFD8;
+    --gold:#C8952E;
+    --gold-soft:#F3E3C4;
+    --good:#2F7D5C;
+    --good-bg:#E5F1EA;
+    --bad:#B8453A;
+    --bad-bg:#F8E9E7;
+    --muted:#707A72;
+    --radius:14px;
+    --shadow: 0 1px 2px rgba(22,35,63,.06), 0 8px 24px -12px rgba(22,35,63,.18);
+    --serif: "Fraunces", Georgia, serif;
+    --sans: "IBM Plex Sans", -apple-system, Segoe UI, sans-serif;
+    --mono: "IBM Plex Mono", "Consolas", monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      linear-gradient(var(--paper-line) 1px, transparent 1px) 0 0/100% 42px,
+      var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--gold-soft);}
+
+  .shell{max-width:1000px;margin:0 auto;padding:28px 20px 80px;}
+  header.topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    gap:16px;margin-bottom:22px;flex-wrap:wrap;
+  }
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand .mark{
+    width:40px;height:40px;border-radius:10px;background:var(--ink);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow: var(--shadow); flex-shrink:0;
+  }
+  .brand .mark svg{width:20px;height:20px;}
+  .brand h1{font-family:var(--serif);font-size:19px;font-weight:600;margin:0;letter-spacing:.2px;}
+  .brand .sub{font-size:12px;color:var(--muted);margin-top:1px;}
+
+  .topbar-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .nav-btn{
+    background:var(--card);border:1px solid var(--line);color:var(--ink-soft);
+    font-family:var(--sans);font-size:12.5px;font-weight:600;
+    padding:9px 13px;border-radius:9px;cursor:pointer;box-shadow:var(--shadow);
+    display:flex;align-items:center;gap:6px;
+  }
+  .nav-btn:hover{border-color:var(--gold);color:var(--ink);}
+  .nav-btn.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+
+  .progress-pill{
+    display:flex;align-items:center;gap:10px;
+    background:var(--card);border:1px solid var(--line);
+    border-radius:999px;padding:6px 14px 6px 6px;
+    box-shadow:var(--shadow);
+  }
+  .ring{width:34px;height:34px;flex-shrink:0;}
+  .progress-pill .txt{font-size:12px;color:var(--ink-soft);line-height:1.25;}
+  .progress-pill .txt b{color:var(--ink);font-size:13px;display:block;font-family:var(--mono);}
+
+  .view{display:none;}
+  .view.active{display:block;}
+
+  /* ---------- Overview ---------- */
+  .hero .row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px;}
+  .hero-btn{
+    flex:1 1 200px;background:var(--ink);color:#fff;border:none;border-radius:12px;
+    padding:16px 18px;text-align:left;cursor:pointer;box-shadow:var(--shadow);
+    font-family:var(--sans);
+  }
+  .hero-btn .t{font-family:var(--serif);font-size:15.5px;font-weight:600;display:block;margin-bottom:3px;}
+  .hero-btn .d{font-size:12px;opacity:.75;}
+  .hero-btn.alt{background:var(--card);color:var(--ink);border:1px solid var(--line);}
+  .hero-btn.alt .d{color:var(--muted);opacity:1;}
+
+  .chapters{display:flex;flex-direction:column;gap:14px;}
+  .chapter{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius);box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  .chapter-head{
+    display:flex;align-items:center;gap:16px;
+    padding:16px 18px;cursor:pointer;user-select:none;
+    position:relative;
+  }
+  .chapter-head:hover{background:#FAFAF7;}
+  .tab-num{
+    font-family:var(--serif);font-weight:600;font-size:22px;
+    color:var(--card);background:var(--ink);
+    width:42px;height:42px;border-radius:9px;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .chapter-info{flex:1;min-width:0;}
+  .chapter-info h2{margin:0 0 4px;font-family:var(--serif);font-size:17px;font-weight:600;}
+  .chapter-bar{
+    height:6px;border-radius:99px;background:var(--paper-line);
+    overflow:hidden;max-width:340px;
+  }
+  .chapter-bar > span{display:block;height:100%;background:var(--gold);border-radius:99px;transition:width .4s ease;}
+  .chapter-meta{font-size:11.5px;color:var(--muted);margin-top:5px;font-family:var(--mono);}
+  .chev{
+    width:22px;height:22px;color:var(--muted);flex-shrink:0;
+    transition:transform .25s ease;
+  }
+  .chapter.open .chev{transform:rotate(90deg);}
+
+  .subtopics{max-height:0;overflow:hidden;transition:max-height .3s ease;border-top:1px solid transparent;}
+  .chapter.open .subtopics{border-top:1px solid var(--line);}
+  .subtopics-inner{display:flex;flex-wrap:wrap;gap:10px;padding:16px 18px 18px 18px;}
+  .sub-card{
+    flex:1 1 220px;min-width:220px;
+    background:var(--paper);border:1px solid var(--line);
+    border-radius:10px;padding:12px 14px;cursor:pointer;
+    transition:border-color .15s ease, transform .15s ease;
+    position:relative;
+  }
+  .sub-card:hover{border-color:var(--gold);transform:translateY(-1px);}
+  .sub-card h3{margin:0 0 6px;font-size:13.5px;font-weight:600;}
+  .sub-progress{display:flex;align-items:center;gap:8px;}
+  .sub-progress .bar{flex:1;height:5px;background:var(--paper-line);border-radius:99px;overflow:hidden;}
+  .sub-progress .bar > span{display:block;height:100%;background:var(--good);}
+  .sub-progress .count{font-family:var(--mono);font-size:10.5px;color:var(--muted);white-space:nowrap;}
+  .sub-card.done::after{
+    content:"✓ gemeistert";position:absolute;top:10px;right:12px;
+    font-size:10px;font-family:var(--mono);color:var(--good);
+  }
+
+  footer.note{text-align:center;color:var(--muted);font-size:11.5px;margin-top:50px;font-family:var(--mono);}
+
+  @media (max-width:560px){
+    .subtopics-inner{flex-direction:column;}
+  }
+
+  /* ---------- Topic detail view ---------- */
+  .topic-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:12px;flex-wrap:wrap;}
+  .back-btn{
+    display:flex;align-items:center;gap:6px;background:none;border:none;
+    color:var(--ink-soft);font-family:var(--sans);font-size:13px;font-weight:600;
+    cursor:pointer;padding:8px 6px;border-radius:8px;
+  }
+  .back-btn:hover{background:var(--card);color:var(--ink);}
+  .topic-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;}
+  .topic-title{font-family:var(--serif);font-size:26px;font-weight:600;margin:0 0 18px;}
+
+  .theory-block{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:22px 24px;margin-bottom:16px;
+  }
+  .theory-block p.intro{font-size:14.5px;line-height:1.65;color:var(--ink-soft);margin:0 0 14px;}
+  .theory-block h4{
+    font-family:var(--serif);font-size:14px;font-weight:600;margin:18px 0 8px;
+    color:var(--ink);
+  }
+  .theory-block h4:first-of-type{margin-top:0;}
+  .formula-box{
+    background:#F5F4EF;border:1px solid var(--line);border-radius:10px;
+    padding:14px 16px;font-family:var(--mono);font-size:13px;line-height:1.85;
+    color:var(--ink);white-space:pre-line;margin-bottom:10px;
+  }
+  .example-box{
+    background:#FBFCFF;border:1px solid var(--line);border-left:4px solid var(--ink);
+    border-radius:10px;padding:14px 16px;margin-bottom:10px;
+  }
+  .example-box .ex-title{font-size:12.5px;font-weight:700;color:var(--ink);margin-bottom:8px;}
+  .example-box .ex-body{font-family:var(--mono);font-size:12.8px;line-height:1.8;color:var(--ink-soft);white-space:pre-line;}
+  .merksatz{
+    background:var(--gold-soft);border-radius:10px;padding:12px 16px;
+    font-size:13px;line-height:1.6;color:#5B4419;margin-bottom:4px;
+  }
+  .merksatz b{color:#3F300F;}
+
+  .topic-cta{
+    display:flex;align-items:center;justify-content:space-between;gap:14px;
+    background:var(--ink);color:#fff;border-radius:var(--radius);
+    padding:18px 22px;margin-top:20px;flex-wrap:wrap;box-shadow:var(--shadow);
+  }
+  .topic-cta .l .t{font-family:var(--serif);font-size:16px;font-weight:600;display:block;}
+  .topic-cta .l .d{font-size:12px;opacity:.75;margin-top:2px;}
+  .topic-cta button{
+    background:var(--gold);color:var(--ink);border:none;border-radius:9px;
+    font-family:var(--sans);font-weight:700;font-size:13.5px;padding:11px 18px;cursor:pointer;
+    white-space:nowrap;
+  }
+  .topic-cta button:hover{filter:brightness(1.06);}
+
+  /* ---------- Practice view ---------- */
+  .dots{display:flex;gap:6px;flex-wrap:wrap;max-width:260px;justify-content:flex-end;}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--paper-line);}
+  .dot.current{background:var(--ink);}
+  .dot.good{background:var(--good);}
+  .dot.again{background:var(--bad);}
+
+  .session-title{text-align:center;margin-bottom:22px;}
+  .session-title .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);}
+  .session-title h2{font-family:var(--serif);font-size:22px;margin:4px 0 0;font-weight:600;}
+
+  .card-stage{perspective:1600px;max-width:640px;margin:0 auto;}
+  .flipcard{
+    position:relative;min-height:340px;
+    transform-style:preserve-3d;transition:transform .55s cubic-bezier(.4,.2,.2,1);
+  }
+  .flipcard.flipped{transform:rotateY(180deg);}
+  .face{
+    position:absolute;inset:0;backface-visibility:hidden;
+    background:var(--card);border:1px solid var(--line);
+    border-radius:16px;box-shadow:var(--shadow);
+    padding:26px 26px 22px;display:flex;flex-direction:column;
+  }
+  .face.back{transform:rotateY(180deg);background:#FCFBF7;}
+  .face .kicker{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px;
+  }
+  .face.back .kicker{color:var(--good);}
+  .kicker .chip{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:2px 7px;}
+  .kicker-back-btn{
+    margin-left:auto;background:none;border:1px solid var(--line);color:var(--muted);
+    font-family:var(--sans);font-size:11px;font-weight:600;
+    padding:4px 10px;border-radius:7px;cursor:pointer;
+  }
+  .kicker-back-btn:hover{border-color:var(--gold);color:var(--ink);}
+  .face-body{flex:1;font-size:15.5px;line-height:1.6;white-space:pre-line;overflow-y:auto;}
+  .face.back .face-body{font-family:var(--mono);font-size:13.8px;line-height:1.75;color:var(--ink-soft);}
+  .face .hint{margin-top:14px;font-size:12.5px;color:var(--gold);background:var(--gold-soft);border-radius:8px;padding:8px 11px;display:none;}
+  .face .hint.show{display:block;}
+
+  .loesung-kurz{font-size:16px;font-weight:600;color:var(--good);line-height:1.5;}
+  .frage-recap{
+    font-size:12.5px;color:var(--muted);line-height:1.5;white-space:pre-line;
+    padding-bottom:10px;margin-bottom:12px;border-bottom:1px dashed var(--line);
+  }
+  .rechenweg-wrap{margin-top:16px;}
+  .rechenweg-toggle{
+    background:none;border:1px solid var(--line);color:var(--ink-soft);
+    font-family:var(--sans);font-size:12px;font-weight:600;
+    padding:7px 11px;border-radius:8px;cursor:pointer;
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .rechenweg-toggle:hover{border-color:var(--gold);color:var(--ink);}
+  .rechenweg-box{
+    margin-top:10px;background:#F5F4EF;border:1px solid var(--line);border-radius:10px;
+    padding:13px 15px;font-family:var(--mono);font-size:12.8px;line-height:1.85;
+    color:var(--ink-soft);white-space:pre-line;display:none;
+  }
+  .rechenweg-box.show{display:block;}
+
+  .settings-toggle{
+    display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);
+    border-radius:999px;padding:7px 12px 7px 12px;box-shadow:var(--shadow);cursor:pointer;
+    font-size:12px;color:var(--ink-soft);font-weight:600;user-select:none;
+  }
+  .settings-toggle:hover{border-color:var(--gold);}
+  .switch{
+    width:32px;height:18px;border-radius:99px;background:var(--paper-line);
+    position:relative;flex-shrink:0;transition:background .2s ease;
+  }
+  .switch::after{
+    content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .2s ease;
+  }
+  .settings-toggle.on .switch{background:var(--good);}
+  .settings-toggle.on .switch::after{transform:translateX(14px);}
+
+  .face-controls{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:10px;}
+  .ghost-btn{
+    background:none;border:1px solid var(--line);color:var(--ink-soft);
+    font-family:var(--sans);font-size:12.5px;font-weight:600;
+    padding:8px 12px;border-radius:8px;cursor:pointer;
+  }
+  .ghost-btn:hover{border-color:var(--gold);color:var(--ink);}
+  .flip-btn{
+    background:var(--ink);color:#fff;border:none;border-radius:8px;
+    font-family:var(--sans);font-weight:600;font-size:13.5px;
+    padding:10px 18px;cursor:pointer;
+  }
+  .flip-btn:hover{background:var(--ink-soft);}
+
+  .judge-row{display:flex;gap:12px;margin-top:20px;}
+  .judge-btn{
+    flex:1;padding:13px 10px;border-radius:10px;border:1px solid var(--line);
+    background:var(--card);cursor:pointer;font-family:var(--sans);font-weight:600;font-size:13.5px;
+    display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s ease;
+  }
+  .judge-btn.again:hover{background:var(--bad-bg);border-color:var(--bad);color:var(--bad);}
+  .judge-btn.good:hover{background:var(--good-bg);border-color:var(--good);color:var(--good);}
+
+  .session-done{max-width:520px;margin:40px auto 0;text-align:center;}
+  .session-done .badge{
+    width:64px;height:64px;border-radius:50%;background:var(--good-bg);color:var(--good);
+    display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px;
+  }
+  .session-done h2{font-family:var(--serif);font-size:21px;margin:0 0 8px;}
+  .session-done p{color:var(--muted);font-size:14px;margin:0 0 22px;}
+  .session-done .actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+  .primary-btn{
+    background:var(--ink);color:#fff;border:none;border-radius:9px;
+    font-family:var(--sans);font-weight:600;font-size:13.5px;padding:11px 18px;cursor:pointer;
+  }
+
+  /* ---------- Formelsammlung ---------- */
+  .formeln-search{
+    width:100%;padding:12px 16px;border-radius:10px;border:1px solid var(--line);
+    font-family:var(--sans);font-size:14px;margin-bottom:20px;background:var(--card);
+    box-shadow:var(--shadow);
+  }
+  .formeln-search:focus{outline:2px solid var(--gold);outline-offset:1px;}
+  .formeln-chapter h2{font-family:var(--serif);font-size:19px;margin:26px 0 10px;color:var(--ink);}
+  .formeln-chapter h2:first-child{margin-top:0;}
+  .formeln-sub{margin-bottom:8px;}
+  .formeln-sub h3{font-family:var(--serif);font-size:14.5px;margin:14px 0 6px;color:var(--ink-soft);}
+  .formeln-sub.hidden{display:none;}
+  .formeln-chapter.hidden{display:none;}
+
+  @media (max-width:560px){
+    .face-body{font-size:14.5px;}
+    .face{padding:20px 18px;}
+    .theory-block{padding:18px 16px;}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div class="brand">
+      <div class="mark">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 5h16v3H4z" fill="#C8952E"/>
+          <path d="M4 10h16v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z" fill="#F5F4EF"/>
+          <path d="M9 14h6M9 17h4" stroke="#16233F" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Karteikasten</h1>
+        <div class="sub">Wirtschaftsmathematik · Klausurvorbereitung</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="nav-btn" id="navFormelsammlung">📖 Formelsammlung</button>
+      <div class="settings-toggle" id="toggleRechenweg">
+        <span>🧮 Rechenweg immer zeigen</span>
+        <div class="switch"></div>
+      </div>
+      <div class="progress-pill">
+        <svg class="ring" viewBox="0 0 36 36">
+          <circle cx="18" cy="18" r="15.5" fill="none" stroke="#DADCD2" stroke-width="3.5"/>
+          <circle id="ringFg" cx="18" cy="18" r="15.5" fill="none" stroke="#C8952E" stroke-width="3.5"
+            stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="97.4"
+            transform="rotate(-90 18 18)"/>
+        </svg>
+        <div class="txt">Gesamt<b id="overallPct">0%</b></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- VIEW: OVERVIEW -->
+  <section class="view active" id="view-overview">
+    <div class="hero">
+      <div class="row">
+        <button class="hero-btn" id="btnContinue">
+          <span class="t">Weiter üben →</span>
+          <span class="d">Setzt bei offenen Aufgaben fort</span>
+        </button>
+        <button class="hero-btn alt" id="btnWrong">
+          <span class="t">Nur Wiederholungen</span>
+          <span class="d">Karten, die als „nochmal" markiert sind</span>
+        </button>
+      </div>
+    </div>
+    <section class="chapters" id="chapters"></section>
+    <footer class="note">Fortschritt wird lokal in diesem Browser gespeichert (localStorage) · Hochschule Ansbach · Wirtschaftsmathematik SoSe 2024</footer>
+  </section>
+
+  <!-- VIEW: TOPIC DETAIL (Theorie + Start Übung) -->
+  <section class="view" id="view-topic"></section>
+
+  <!-- VIEW: PRACTICE -->
+  <section class="view" id="view-practice"></section>
+
+  <!-- VIEW: FORMELSAMMLUNG -->
+  <section class="view" id="view-formeln"></section>
+
+</div>
+<script>
+/* =====================================================================
+   DATA — Theorie + Übungsaufgaben nach Stoffplan
+   ===================================================================== */
+const DATA = [
+{ id:"c1", num:"1", title:"Allgemeine Grundlagen", subs:[
+  { id:"1.1", title:"Aussagenlogik",
+    theory:{
+      intro:"Eine Aussage ist entweder wahr (w) oder falsch (f) – nie beides (Prinzip der Zweiwertigkeit). Aussagen werden über Wahrheitstafeln verknüpft und bewiesen.",
+      blocks:[
+        { h:"Wichtige Verknüpfungen", f:"A ∧ B  (Konjunktion / UND)   – wahr, wenn A UND B wahr sind\nA ∨ B  (Disjunktion / ODER)  – wahr, wenn A ODER B (oder beide) wahr sind\n¬A     (Negation)            – kehrt den Wahrheitswert um\nA ∧ ¬A ist immer falsch   (Satz vom ausgeschlossenen Widerspruch)\nA ∨ ¬A ist immer wahr     (Satz vom ausgeschlossenen Dritten)\nRangfolge: ∧ bindet stärker als ∨ (wie „Punkt vor Strich“)." },
+        { h:"Gesetze von De Morgan", f:"¬(A ∧ B)  ⇔  ¬A ∨ ¬B\n¬(A ∨ B)  ⇔  ¬A ∧ ¬B" },
+      ],
+      example:{ title:"Wahrheitstafel als Beweis für ¬(A∧B) ⇔ ¬A∨¬B", body:"A  B | A∧B | ¬(A∧B) | ¬A ¬B | ¬A∨¬B\nw  w |  w  |   f    | f  f  |   f\nw  f |  f  |   w    | f  w  |   w\nf  w |  f  |   w    | w  f  |   w\nf  f |  f  |   w    | w  w  |   w\n→ Spalten stimmen überein → Gesetz bewiesen." },
+      merke:"Löse jede Aufgabe zur Aussagenlogik mit einer vollständigen Wahrheitstafel (alle Kombinationen von w/f) – das ist der sicherste, klausurtaugliche Beweisweg."
+    },
+    cards:[
+      { f:"Zeige mit einer Wahrheitstafel, dass gilt:\n¬(A ∨ B) ⇔ ¬A ∧ ¬B", h:"Stelle für alle 4 Kombinationen von A und B beide Seiten nebeneinander.", l:"Wahr – die Wahrheitstafeln für ¬(A∨B) und ¬A∧¬B stimmen in jeder Zeile überein → Gesetz bewiesen.", w:"A  B | A∨B | ¬(A∨B) | ¬A ¬B | ¬A∧¬B\nw  w |  w  |   f    | f  f  |   f\nw  f |  w  |   f    | f  w  |   f\nf  w |  w  |   f    | w  f  |   f\nf  f |  f  |   w    | w  w  |   w\n→ Spalten stimmen überein → Gesetz bewiesen." },
+      { f:"Sind die Aussagen A ∧ ¬A und A ∨ ¬A für jede Aussage A wahr oder falsch?", h:"Prinzip vom ausgeschlossenen Widerspruch / Dritten.", l:"A∧¬A ist immer falsch, A∨¬A ist immer wahr.", w:"A ∧ ¬A ist IMMER falsch (Satz vom ausgeschlossenen Widerspruch).\nA ∨ ¬A ist IMMER wahr (Satz vom ausgeschlossenen Dritten)." },
+      { f:"Vereinfache mit De Morgan: ¬(A ∧ ¬B)", h:"De Morgan: ¬(X∧Y) = ¬X ∨ ¬Y, dann doppelte Negation auflösen.", l:"¬(A ∧ ¬B) = ¬A ∨ B", w:"¬(A ∧ ¬B) = ¬A ∨ ¬(¬B) = ¬A ∨ B" },
+      { f:"Ist die Aussage (A ∧ B) → A eine Tautologie (immer wahr)? Prüfe mit Wahrheitstafel.", h:"X → Y ist nur falsch, wenn X wahr und Y falsch ist. Prüfe alle Fälle für A,B.", l:"Ja, (A∧B)→A ist eine Tautologie (in jeder Zeile wahr).", w:"A B | A∧B | (A∧B)→A\nw w |  w  |   w\nw f |  f  |   w\nf w |  f  |   w\nf f |  f  |   w\n→ in allen Zeilen wahr → Tautologie." },
+      { f:"Formuliere die Verneinung von: „Der Kredit wird genehmigt UND die Zinsen sind niedrig.“", h:"De Morgan anwenden: ¬(A∧B) = ¬A ∨ ¬B", l:"„Der Kredit wird NICHT genehmigt ODER die Zinsen sind NICHT niedrig.“", w:"„Der Kredit wird NICHT genehmigt ODER die Zinsen sind NICHT niedrig.“\n(mindestens eine der beiden Teilaussagen ist falsch)" },
+    ]},
+  { id:"1.2", title:"Mengenlehre",
+    theory:{
+      intro:"Mengenoperationen verhalten sich strukturell genau wie die Aussagenlogik: ∩ entspricht ∧, ∪ entspricht ∨.",
+      blocks:[
+        { h:"Grundoperationen", f:"A ∩ B  = Schnittmenge (Elemente in A UND B)\nA ∪ B  = Vereinigungsmenge (Elemente in A ODER B)" },
+        { h:"Rechengesetze", f:"Kommutativgesetz:   A∩B = B∩A         A∪B = B∪A\nAssoziativgesetz:   (A∩B)∩C = A∩(B∩C)\nDistributivgesetz:  A∩(B∪C) = (A∩B)∪(A∩C)\nAbsorptionsgesetz:  A∩(A∪B) = A        A∪(A∩B) = A" },
+      ],
+      example:{ title:"Anwendung des Distributivgesetzes", body:"A∩(B∪C) = (A∩B)∪(A∩C)\nentspricht in der Aussagenlogik: A∧(B∨C) = (A∧B)∨(A∧C)" },
+      merke:"∩ ↔ ∧ (UND), ∪ ↔ ∨ (ODER) – wer die Gesetze der Aussagenlogik kennt, kennt automatisch die der Mengenlehre."
+    },
+    cards:[
+      { f:"Vereinfache A ∪ (A ∩ B) mit dem passenden Gesetz.", h:"Absorptionsgesetz.", l:"A ∪ (A ∩ B) = A", w:"A ∪ (A ∩ B) = A   (Absorptionsgesetz)" },
+      { f:"Welches Gesetz der Aussagenlogik entspricht dem Distributivgesetz A ∩ (B ∪ C) = (A∩B) ∪ (A∩C)?", h:"∩ ↔ ∧, ∪ ↔ ∨", l:"A ∧ (B ∨ C) = (A∧B) ∨ (A∧C)", w:"A ∧ (B ∨ C) = (A∧B) ∨ (A∧C)\n→ Mengenlehre und Aussagenlogik sind strukturell identisch (∩=∧, ∪=∨)." },
+      { f:"Gegeben A={1,2,3,4}, B={3,4,5,6}. Bestimme A∩B und A∪B.", h:"Schnittmenge = gemeinsame Elemente, Vereinigung = alle Elemente ohne Wiederholung.", l:"A∩B = {3,4},  A∪B = {1,2,3,4,5,6}", w:"A∩B = {3,4}\nA∪B = {1,2,3,4,5,6}" },
+      { f:"Vereinfache A ∩ (A ∪ B) mit dem Absorptionsgesetz.", h:"Analog zur anderen Absorptionsregel.", l:"A ∩ (A ∪ B) = A", w:"A ∩ (A ∪ B) = A   (Absorptionsgesetz)" },
+    ]},
+]},
+{ id:"c2", num:"2", title:"Finanzmathematik", subs:[
+  { id:"2.1", title:"Zinsrechnung",
+    theory:{
+      intro:"Unterschieden werden einfache Verzinsung (nur Anfangskapital wird verzinst) und Zinseszins (Zinsen werden mitverzinst). q = 1 + p/100 ist der Aufzinsungsfaktor.",
+      blocks:[
+        { h:"Einfache Verzinsung", f:"Zinsen pro Jahr:        Z = K0 · p/100\nZinsen nach n Jahren:    Zn = n · K0 · p/100\nKapital nach n Jahren:   Kn = K0 + Zn = K0·(1 + n·p/100)" },
+        { h:"Zinseszinsformel", f:"Kn = K0 · q^n            mit q = 1 + p/100\nAbzinsung:     K0 = Kn / q^n = Kn · q^(-n)\nZinssatz:      q = (Kn/K0)^(1/n)\nLaufzeit:      n = log(Kn/K0) / log(q)" },
+        { h:"Unterjährige Verzinsung", f:"Kn = K0 · (1 + p/(100·m))^(m·n)      m = Zinsperioden pro Jahr\nEffektivzins > Nominalzins, da unterjährige Zinsen zusätzlich verzinst werden." },
+      ],
+      example:{ title:"Zinseszins – Endkapital & Zinssatz", body:"K0=1.000€, p=3%, n=5 Jahre: K5 = 1000·1,03^5 = 1.159,27€\n\n10.000€ sollen in 5 Jahren zu 12.000€ anwachsen:\n1,2 = q^5 → q = 1,2^(1/5) = 1,0371 → p = 3,71%" },
+      merke:"Bei „in wie vielen Jahren...“-Fragen immer den Logarithmus verwenden: n = log(Verhältnis) / log(q)."
+    },
+    cards:[
+      { f:"K0 = 8.000 €, p = 4%, n = 6 Jahre, Zinseszins.\nBerechne das Endkapital K6.", h:"Kn = K0 · q^n mit q=1+p/100", l:"K6 = 10.122,55 €", w:"q = 1,04\nK6 = 8000 · 1,04^6 = 8000 · 1,26532\nK6 = 10.122,55 €" },
+      { f:"Ein Kapital von 10.000 € soll in 5 Jahren auf 12.000 € anwachsen.\nWelcher Zinssatz p ist dafür nötig?", h:"q^n = Kn/K0, dann n-te Wurzel ziehen.", l:"p = 3,71 %", w:"q^5 = 12.000/10.000 = 1,2\nq = 1,2^(1/5) = 1,0371\np = (q-1)·100 = 3,71 %" },
+      { f:"K0 = 10.000 €, p = 7% p.a., vierteljährliche Verzinsung (m=4), n=1 Jahr.\nBerechne K1 und den effektiven Jahreszins.", h:"Kn = K0·(1+p/(100·m))^(m·n)", l:"K1 = 10.718,59 €, effektiver Jahreszins = 7,19 %", w:"K1 = 10.000 · (1 + 0,07/4)^4 = 10.718,59 €\neffektiver Zins = (10.718,59/10.000 - 1)·100 = 7,19 %\n(> Nominalzins 7%, da unterjährig verzinst wird)" },
+      { f:"In wie vielen Jahren verdoppelt sich ein Kapital bei p = 4% Zinseszins?", h:"2 = q^n, dann nach n auflösen mit Logarithmus.", l:"Nach 18 Jahren ist das Kapital verdoppelt.", w:"2 = 1,04^n\nn = log(2) / log(1,04) = 17,67\n→ nach 18 Jahren ist das Kapital verdoppelt" },
+      { f:"Ein Sparbrief mit einfacher Verzinsung: aus 10.000 € werden in 5 Jahren 11.000 €.\nWelcher Zinssatz wurde vereinbart?", h:"Kn = K0·(1+n·p/100), nach p auflösen.", l:"p = 2 %", w:"11.000 = 10.000·(1 + 5·p/100)\n1,1 = 1 + 0,05p\n0,1 = 0,05p → p = 2 %" },
+      { f:"Zwei Angebote: Bank A verzinst 10.000€ über 5 Jahre mit 4% Zinseszins. Bank B zahlt nach 5 Jahren pauschal 12.166,53€ aus.\nWelches Angebot ist günstiger?", h:"Berechne K5 für Bank A und vergleiche direkt.", l:"Beide Angebote sind gleichwertig (12.166,53 €).", w:"Bank A: K5 = 10.000 · 1,04^5 = 12.166,53 €\nBeide Angebote sind identisch (12.166,53€ = 4% Zinseszins über 5 Jahre)." },
+    ]},
+  { id:"2.2", title:"Rentenrechnung",
+    theory:{
+      intro:"Eine Rente ist eine gleichbleibende Zahlung r in regelmäßigen Abständen. Unterschieden wird, ob die Rate am Ende (nachschüssig) oder am Anfang (vorschüssig) der Periode gezahlt wird.",
+      blocks:[
+        { h:"Nachschüssige Rente", f:"Rentenendwert:   Rn = r · (q^n - 1) / (q - 1)\nRentenbarwert:   R0 = Rn / q^n" },
+        { h:"Vorschüssige Rente", f:"Rentenendwert:   Rn* = r · q · (q^n - 1) / (q - 1)   =  nachschüssiger Wert · q" },
+      ],
+      example:{ title:"Rentenendwert und -barwert", body:"Sparvertrag: jährlich 5.000€, 8 Jahre, p=3%, nachschüssig\nR8 = 5000·(1,03^8-1)/0,03 = 44.923,87€\nR0 = 44.923,87 / 1,03^8 = 35.472,60€" },
+      merke:"Vorschüssig ist immer q-mal so groß wie nachschüssig (eine Periode mehr verzinst)."
+    },
+    cards:[
+      { f:"Sparvertrag: jährlich 4.000 €, 10 Jahre, p=3%, nachschüssig.\nBerechne den Rentenendwert R10.", h:"Rn = r · (q^n - 1)/(q-1)", l:"R10 = 45.855,66 €", w:"q = 1,03\nR10 = 4000 · (1,03^10 - 1)/0,03\nR10 = 4000 · 11,4639 = 45.855,66 €" },
+      { f:"Ein Sparvertrag zahlt jährlich 4.000 €, Laufzeit 10 Jahre, p=3%, nachschüssig, mit einem Rentenendwert von R10=45.855,66 €.\nWie hoch ist der Rentenbarwert (heutiger Wert) dieser Rente?", h:"R0 = Rn / q^n", l:"R0 = 34.121,49 €", w:"q = 1,03\nR0 = 45.855,66 / 1,03^10 = 34.121,49 €" },
+      { f:"Sparvertrag jährlich 5.000 €, 12 Jahre, p=3%, VORSCHÜSSIG.\nBerechne den Rentenendwert.", h:"Vorschüssig = nachschüssiger Wert · q", l:"R12* (vorschüssig) = 73.088,95 €", w:"nachschüssig: R12 = 5000·(1,03^12-1)/0,03 = 70.960,15 €\nvorschüssig: R12* = 70.960,15 · 1,03 = 73.088,95 €" },
+      { f:"Welcher Betrag muss heute angelegt werden, um 20 Jahre lang jährlich 10.000 € (nachschüssig) entnehmen zu können? p=3%", h:"Rentenbarwertformel: R0 = r·(q^n-1)/(q^n·(q-1))", l:"R0 = 148.774,75 €", w:"R0 = 10.000 · (1,03^20-1) / (1,03^20 · 0,03)\nR0 = 10.000 · 14,8775 = 148.774,75 €" },
+      { f:"Welche jährliche nachschüssige Rate r ergibt bei p=4% und n=15 Jahren einen Rentenendwert von 100.000€?", h:"Formel nach r umstellen: r = Rn·(q-1)/(q^n-1)", l:"r = 4.994,13 €", w:"q=1,04\nr = 100.000 · 0,04 / (1,04^15 - 1)\nr = 4.000 / 0,80094 = 4.994,13 €" },
+      { f:"Vergleiche zwei Angebote für eine Abfindung: (1) sofort 80.000€ oder (2) 25 Jahre lang jährlich nachschüssig 5.000€ bei p=4%.\nWelches Angebot ist mehr wert (Barwertvergleich)?", h:"Rentenbarwert von Angebot 2 berechnen und mit 80.000€ vergleichen.", l:"Angebot 1 (sofort 80.000€) ist besser – Barwert von Angebot 2 nur 78.110,40€.", w:"R0 = 5000·(1,04^25-1)/(1,04^25·0,04) = 78.110,40 €\n80.000€ > 78.110,40€ → Angebot 1 (sofort) ist besser." },
+    ]},
+  { id:"2.3", title:"Tilgungsrechnung",
+    theory:{
+      intro:"Ein Kredit K0 wird über Zinsen und Tilgung zurückgezahlt. Zwei Verfahren: Ratentilgung (Tilgungsrate konstant) und Annuitätentilgung (Zins+Tilgung = Annuität konstant).",
+      blocks:[
+        { h:"Ratentilgung", f:"Tilgungsrate:            T = K0 / n   (jedes Jahr gleich)\nZinsen im Jahr m:        Zm = Restschuld(m-1) · p/100\nRestschuld nach m Jahren: Km = K0 - m·T" },
+        { h:"Annuitätentilgung", f:"Annuität:   A = K0 · q^n · (q-1) / (q^n - 1)   (jedes Jahr konstant)\nTilgungsrate wächst geometrisch:  Tm = T1 · q^(m-1)\nRestschuld:  Km = K0 - T1 · (q^m - 1)/(q-1)" },
+      ],
+      example:{ title:"Annuitätentilgung, Kredit 10.000€, 4%, 5 Jahre", body:"A = 10.000·1,04^5·0,04/(1,04^5-1) = 2.246,27€ (konstant)\nJahr 1: Zinsen=400,00  Tilgung=1.846,27  Restschuld=8.153,73\nJahr 5: Zinsen=86,40   Tilgung=2.159,87  Restschuld=0,00" },
+      merke:"Ratentilgung: sinkende Belastung, insgesamt weniger Zinsen. Annuitätentilgung: konstante Rate, planbar, insgesamt etwas mehr Zinsen."
+    },
+    cards:[
+      { f:"Kredit K0 = 10.000 €, p = 4%, n = 5 Jahre, RATENTILGUNG (konstante Tilgung).\nWie hoch ist die jährliche Tilgungsrate? Wie hoch die Restschuld nach 2 Jahren?", h:"T = K0/n, Zinsen jedes Jahr auf die Restschuld", l:"T = 2.000 €/Jahr, Restschuld nach 2 Jahren = 6.000 €", w:"T = 10.000/5 = 2.000 € pro Jahr\nJahr1: Zinsen=400, Restschuld=8.000\nJahr2: Zinsen=320, Restschuld=6.000\n→ Restschuld nach 2 Jahren = 6.000 €" },
+      { f:"Ein Kredit über K0 = 10.000 €, p = 4%, n = 5 Jahre wird mit ANNUITÄTENTILGUNG (konstante Annuität) getilgt.\nBerechne die konstante Annuität.", h:"A = K0 · q^n · (q-1)/(q^n-1)", l:"A = 2.246,27 € (jedes Jahr konstant)", w:"A = 10.000 · 1,04^5 · 0,04 / (1,04^5 - 1)\nA = 10.000 · 1,21665 · 0,04 / 0,21665\nA = 2.246,27 € (jedes Jahr konstant)" },
+      { f:"Kredit über 200.000 €, p=6%, n=15 Jahre, Annuitätentilgung.\nBerechne die Annuität und die Restschuld nach 3 Jahren.", h:"Erst Annuität, dann T1 = A - K0·p/100, dann Restschuld über geometrische Reihe.", l:"A = 20.588,55 €, Restschuld nach 3 Jahren = 172.651,45 €", w:"A = 200.000 · 1,06^15 · 0,06/(1,06^15-1) = 20.588,55 €\nT1 = 20.588,55 - 12.000 = 8.588,55 €\nK3 = 200.000 - 8.588,55·(1,06^3-1)/0,06\nK3 = 200.000 - 27.348,55 = 172.651,45 €" },
+      { f:"Ein Kredit über 10.000€ (4%, 5 Jahre, Annuitätentilgung) hat T1=1.846,27€.\nWie hoch ist die Tilgungsrate im 3. Jahr (T3)?", h:"Tm = T1 · q^(m-1)", l:"T3 = 1.996,93 €", w:"T3 = 1.846,27 · 1,04^2 = 1.846,27 · 1,0816\nT3 = 1.996,93 €" },
+      { f:"Vergleiche für einen Kredit über 10.000€ (4%, 5 Jahre): Bei welchem Verfahren ist die Belastung im 1. Jahr höher – Raten- oder Annuitätentilgung? Begründe kurz.", h:"Vergleiche die Summe aus Zinsen+Tilgung im 1. Jahr für beide Verfahren.", l:"Ratentilgung hat im 1. Jahr die höhere Belastung (2.400€ statt 2.246,27€).", w:"Ratentilgung Jahr1: T=2.000 + Zinsen 400 = 2.400€ Gesamtbelastung\nAnnuitätentilgung Jahr1: konstant 2.246,27€\n→ Ratentilgung hat im 1. Jahr die höhere Belastung (2.400€ > 2.246,27€)." },
+    ]},
+]},
+{ id:"c3", num:"3", title:"Analysis", subs:[
+  { id:"3.1", title:"Funktionen",
+    theory:{
+      intro:"Funktionen beschreiben Zusammenhänge zwischen Größen: y = f(x). Wichtigste Typen: linear, quadratisch, Exponential-/Logarithmusfunktion.",
+      blocks:[
+        { h:"Lineare Funktion", f:"f(x) = m·x + b     m = Steigung, b = y-Achsenabschnitt\nSteigung aus 2 Punkten:  m = (y2-y1)/(x2-x1)" },
+        { h:"Quadratische Funktion / Mitternachtsformel", f:"a·x² + b·x + c = 0\nx1,2 = (-b ± √(b²-4ac)) / (2a)\nDiskriminante D=b²-4ac: D>0 → 2 Lösungen, D=0 → 1 Lösung, D<0 → keine Lösung" },
+        { h:"Exponential-/Logarithmusfunktion", f:"y = a^x  ⇔  x = log_a(y)\nlog(a^n) = n · log(a)   → wichtig bei Laufzeitberechnung (Zinseszins)" },
+      ],
+      example:{ title:"Lineare Funktion aus zwei Punkten", body:"Haushalt A: 4.000 kWh → 2.840€. Haushalt B: 7.000 kWh → 1.700€.\nm = (2840-1700)/(4000-7000) → |m|=0,38 €/kWh\nb = 180€ Grundpreis\nf(x) = 0,38x + 180" },
+      merke:"Bei D<0 bei quadratischen Gleichungen: unbedingt „keine reelle Lösung“ als Antwort hinschreiben, nicht einfach abbrechen."
+    },
+    cards:[
+      { f:"Haushalt A: 4.000 kWh → 2.840 €. Haushalt B: 7.000 kWh → 1.700 €.\nBestimme die lineare Kostenfunktion f(x) = m·x + b.", h:"Steigung m aus zwei Punkten, dann b einsetzen.", l:"f(x) = 0,38x + 180", w:"m = (2840-1700)/(4000-7000) = 1140/(-3000) → |m| = 0,38 €/kWh\nb = 1700 - 0,38·7000 ... → b = 180 €\nf(x) = 0,38x + 180" },
+      { f:"Löse: 4x² - 4x - 24 = 0", h:"Mitternachtsformel mit a=4, b=-4, c=-24", l:"x1 = 3,  x2 = -2", w:"x1,2 = (4 ± √(16+384)) / 8 = (4 ± 20) / 8\nx1 = 3,  x2 = -2" },
+      { f:"Löse: 3x² + 12x + 15 = 0. Wie viele Lösungen gibt es?", h:"Diskriminante D = b²-4ac berechnen.", l:"Keine reelle Lösung (D = -36 < 0).", w:"D = 12² - 4·3·15 = 144 - 180 = -36 < 0\n→ keine reelle Lösung" },
+      { f:"log_2(8) = ? Und: löse 2^x = 32 nach x.", h:"log_a(y) ist die Hochzahl, mit der a potenziert werden muss, um y zu erhalten.", l:"log_2(8) = 3;  x = 5", w:"log_2(8) = 3, denn 2³=8\n2^x = 32 = 2^5 → x = 5" },
+      { f:"Ein Kapital verdreifacht sich bei p=5% Zinseszins. Nach wie vielen Jahren (Logarithmusgesetz nutzen)?", h:"3 = q^n → n = log(3)/log(q)", l:"Nach 23 Jahren.", w:"3 = 1,05^n\nn = log(3) / log(1,05) = 22,52\n→ nach 23 Jahren" },
+    ]},
+  { id:"3.2", title:"Differentialrechnung (1 Var.)",
+    theory:{
+      intro:"Die Ableitung f'(x) gibt die Steigung der Funktion an einer Stelle an. Kurvendiskussion nutzt 1., 2. und 3. Ableitung, um Nullstellen, Extrem- und Wendepunkte zu finden.",
+      blocks:[
+        { h:"Ableitungsregeln", f:"Potenzregel:  f(x)=xⁿ    → f'(x)=n·xⁿ⁻¹\n              f(x)=a·xⁿ  → f'(x)=a·n·xⁿ⁻¹\nKonstante:    f(x)=a     → f'(x)=0" },
+        { h:"Kurvendiskussion – Ablaufschema", f:"1) Nullstellen:    f(x)=0\n2) Extremstellen:  notwendig f'(x)=0; hinreichend f''(x)<0→Max, f''(x)>0→Min\n3) Wendepunkte:    notwendig f''(x)=0; hinreichend f'''(x)≠0" },
+        { h:"Elastizität", f:"e_y,x = f'(x)·x / f(x)  = Grenzfunktion / Durchschnittsfunktion" },
+      ],
+      example:{ title:"Extrem- und Wendepunkt einer Kostenfunktion", body:"K(x)=x³-30x²+300x+1500\nK'(x)=3x²-60x+300=0 → x=10 (doppelt)\nK''(x)=6x-60 → K''(10)=0 → kein Extremum, sondern Sattelpunkt\nK(10)=2500 → Punkt (10/2500)" },
+      merke:"Wenn bei der notwendigen Bedingung f''(x)=0 herauskommt, ist es KEIN Extremum, sondern potenziell ein Wendepunkt (mit f'''(x)≠0 prüfen)."
+    },
+    cards:[
+      { f:"Leite ab: f(x) = 6x⁴ - 3x² + 5x - 7", h:"Potenzregel: xⁿ → n·xⁿ⁻¹", l:"f'(x) = 24x³ - 6x + 5", w:"f'(x) = 24x³ - 6x + 5" },
+      { f:"K(x) = x³ - 30x² + 300x + 1500.\nBestimme Extrem- bzw. Wendepunkte bei x=10.", h:"1. Ableitung =0 (notwendig), 2. Ableitung prüft Max/Min, 3. Ableitung prüft Wendepunkt.", l:"Kein Extremum, sondern Sattelpunkt bei (10 / 2500).", w:"K'(x) = 3x²-60x+300 = 0 → x=10 (doppelte Lösung)\nK''(x) = 6x-60 → K''(10) = 0 → KEIN Extremum\n→ es handelt sich um einen Sattelpunkt (Terrassenpunkt) bei x=10\nK(10) = 2500 → Punkt (10 / 2500)" },
+      { f:"Bestimme alle Extremstellen von f(x) = -x³ + 6x² inkl. Art (Max/Min).", h:"f'(x)=0 notwendig, f''(x) hinreichend: <0 Max, >0 Min", l:"Tiefpunkt (0/0), Hochpunkt (4/32)", w:"f'(x) = -3x²+12x = 0 → x(-3x+12)=0 → x1=0, x2=4\nf''(x) = -6x+12\nf''(0)=12>0 → Minimum, f(0)=0 → Tiefpunkt (0/0)\nf''(4)=-12<0 → Maximum, f(4)=32 → Hochpunkt (4/32)" },
+      { f:"Die Nachfragefunktion sei x(p). Was misst die Elastizität e_x,p und wie wird sie berechnet?", h:"Verhältnis von Grenzfunktion zu Durchschnittsfunktion.", l:"e_x,p = Grenzfunktion / Durchschnittsfunktion", w:"e_x,p = x'(p) · p / x(p) = Grenzfunktion / Durchschnittsfunktion\nSie gibt die relative Änderung von x bezogen auf die relative Änderung von p an." },
+      { f:"Führe eine vollständige Kurvendiskussion durch für f(x) = x³ - 3x² (Nullstellen, Extrempunkte, Wendepunkt).", h:"Erst f(x)=0 faktorisieren, dann f'(x)=0, dann f''(x)=0.", l:"Nullstellen x=0 (doppelt) und x=3; Hochpunkt (0/0), Tiefpunkt (2/-4), Wendepunkt (1/-2).", w:"Nullstellen: x³-3x²=0 → x²(x-3)=0 → x1=0 (doppelt), x2=3\nf'(x)=3x²-6x=0 → x(3x-6)=0 → x1=0, x2=2\nf''(x)=6x-6: f''(0)=-6<0→Max (0/0); f''(2)=6>0→Min (2/-4)\nWendepunkt: f''(x)=0 → x=1, f(1)=-2 → W(1/-2)" },
+      { f:"Leite ab: f(x) = 4/x² + 3√x   (Hinweis: als Potenzen schreiben)", h:"4/x² = 4x⁻²,  3√x = 3x^(1/2)", l:"f'(x) = -8/x³ + 1,5/√x", w:"f(x) = 4x⁻² + 3x^(1/2)\nf'(x) = -8x⁻³ + 1,5x^(-1/2) = -8/x³ + 1,5/√x" },
+    ]},
+  { id:"3.3", title:"Funktionen mehrerer Variablen",
+    theory:{
+      intro:"Bei y=f(x1,x2,...) betrachtet die partielle Ableitung die Steigung in Richtung einer Variablen – alle anderen gelten dabei als Konstante.",
+      blocks:[
+        { h:"Extremwertkriterium (2 Variablen)", f:"Notwendig: f'x1=0 UND f'x2=0  (waagerechte Tangentialebene)\nHinreichend: f''x1x1·f''x2x2 - (f''x1x2)² > 0\n  und f''x1x1<0 → Maximum ;  f''x1x1>0 → Minimum\n  ist der Ausdruck <0 → Sattelpunkt" },
+      ],
+      example:{ title:"Gewinnmaximum bei 2 Produkten", body:"G(x1,x2)=-8x1²-10x2²-15x1x2+850x1+950x2-3000\nG'x1=-16x1-15x2+850=0 ; G'x2=-15x1-20x2+950=0\nLGS lösen → x1≈29, x2≈26\nG''x1x1=-16, G''x2x2=-20, G''x1x2=-15\n(-16)(-20)-(-15)²=95>0 und G''x1x1<0 → Maximum" },
+      merke:"Die zwei partiellen Ableitungen =0 ergeben immer ein LGS mit 2 Gleichungen und 2 Unbekannten – hier greift wieder Kapitel 4.1!"
+    },
+    cards:[
+      { f:"f(x1,x2) = 2x1² + 4x1x2 + 5x2². Bestimme alle ersten und zweiten partiellen Ableitungen.", h:"Beim Ableiten nach x1 wird x2 als Konstante behandelt (und umgekehrt).", l:"f'x1=4x1+4x2,  f'x2=4x1+10x2,  f''x1x1=4,  f''x2x2=10,  f''x1x2=4", w:"f'x1 = 4x1 + 4x2\nf'x2 = 4x1 + 10x2\nf''x1x1 = 4,  f''x2x2 = 10,  f''x1x2 = f''x2x1 = 4" },
+      { f:"G(x1,x2) = -8x1² -10x2² -15x1x2 +850x1 +950x2 -3000.\nBestimme die Extremstelle (notwendige Bedingung) und prüfe, ob es ein Maximum ist.", h:"Beide erste Ableitungen =0 als LGS lösen; hinreichend: f''x1x1·f''x2x2-(f''x1x2)² > 0 UND f''x1x1<0", l:"Maximum bei x1≈29, x2≈26 (hinreichendes Kriterium bestätigt).", w:"G'x1 = -16x1-15x2+850 = 0\nG'x2 = -15x1-20x2+950 = 0\n→ LGS lösen: x1 ≈ 29, x2 ≈ 26\nG''x1x1=-16, G''x2x2=-20, G''x1x2=-15\n(-16)(-20)-(-15)² = 320-225 = 95 > 0 und G''x1x1<0\n→ Maximum bestätigt" },
+      { f:"Was ist die notwendige Bedingung für ein Extremum bei einer Funktion mit zwei unabhängigen Variablen — anschaulich beschrieben?", h:"Denke an die Tangentialebene.", l:"f'x1 = 0 und f'x2 = 0 (waagerechte Tangentialebene).", w:"Alle ersten partiellen Ableitungen müssen null sein:\nf'x1 = 0  und  f'x2 = 0\nAnschaulich: die Tangentialebene an der Stelle liegt waagerecht." },
+      { f:"f(x1,x2) = x1² + x2² - 2x1x2. Bestimme die kritische Stelle und prüfe mit dem hinreichenden Kriterium, ob ein Extremum vorliegt.", h:"Achtung: das Kriterium kann auch 0 oder negativ ergeben (Sattelpunkt).", l:"Kritische Stelle bei x1=x2 (z.B. (0,0)); Kriterium ergibt 0 → keine eindeutige Aussage möglich.", w:"f'x1=2x1-2x2=0 ; f'x2=2x2-2x1=0 → x1=x2 (kritische Gerade, z.B. (0,0))\nf''x1x1=2, f''x2x2=2, f''x1x2=-2\n2·2-(-2)²=4-4=0 → Kriterium unentscheidbar, keine eindeutige Aussage möglich" },
+      { f:"Für f(x1,x2)=-3x1²-2x2²+12x1+8x2 bestimme die Extremstelle und ihre Art.", h:"Erst notwendige Bedingung, dann Determinantenkriterium.", l:"Maximum bei (2/2).", w:"f'x1=-6x1+12=0 → x1=2\nf'x2=-4x2+8=0 → x2=2\nf''x1x1=-6, f''x2x2=-4, f''x1x2=0\n(-6)(-4)-0=24>0 und f''x1x1<0 → Maximum bei (2/2)" },
+    ]},
+  { id:"3.4", title:"Integralrechnung",
+    theory:{
+      intro:"Die Integration ist die Umkehrung der Differentiation: gesucht wird eine Stammfunktion F(x) mit F'(x)=f(x).",
+      blocks:[
+        { h:"Unbestimmtes Integral", f:"∫xⁿ dx = xⁿ⁺¹/(n+1) + C     (für n ≠ -1)\n∫a dx = a·x + C" },
+        { h:"Bestimmtes Integral", f:"∫ von a bis b von f(x)dx = F(b) - F(a)     (Flächeninhalt)" },
+      ],
+      example:{ title:"Stammfunktion und bestimmtes Integral", body:"f(x)=3x²+2x-1 → F(x)=x³+x²-x+C\n∫ von 0 bis 2 f(x)dx = F(2)-F(0) = (8+4-2)-0 = 10" },
+      merke:"Kontrolliere jede Stammfunktion durch Ableiten: F'(x) muss wieder f(x) ergeben. C entspricht in wirtschaftlichen Aufgaben oft den Fixkosten."
+    },
+    cards:[
+      { f:"Bestimme die Stammfunktion F(x) von f(x) = 3x² + 2x - 1", h:"Potenzregel rückwärts: xⁿ → xⁿ⁺¹/(n+1)", l:"F(x) = x³ + x² - x + C", w:"F(x) = x³ + x² - x + C" },
+      { f:"Berechne das bestimmte Integral von 0 bis 2 über f(x) = 3x² + 2x - 1", h:"F(b) - F(a) einsetzen (C fällt weg).", l:"Integral = 10", w:"F(x) = x³+x²-x\nF(2) = 8+4-2 = 10\nF(0) = 0\nIntegral = F(2)-F(0) = 10" },
+      { f:"Die Grenzkostenfunktion ist K'(x) = 3x² - 12x + 20, die Fixkosten betragen 500 €.\nBestimme die Gesamtkostenfunktion K(x).", h:"Integrieren, dann die Konstante C über K(0)=Fixkosten bestimmen.", l:"K(x) = x³ - 6x² + 20x + 500", w:"K(x) = x³ - 6x² + 20x + C\nK(0) = C = 500 (Fixkosten)\nK(x) = x³ - 6x² + 20x + 500" },
+      { f:"Bestimme die Stammfunktion von f(x) = 6/x³ + 4x  (Hinweis: 6/x³ = 6x⁻³)", h:"Potenzregel anwenden, auch bei negativen Exponenten.", l:"F(x) = -3/x² + 2x² + C", w:"f(x) = 6x⁻³ + 4x\nF(x) = 6·x⁻²/(-2) + 4·x²/2 + C = -3x⁻² + 2x² + C = -3/x² + 2x² + C" },
+      { f:"Berechne ∫ von 1 bis 3 von (2x+1) dx", h:"Erst Stammfunktion, dann F(3)-F(1).", l:"Integral = 10", w:"F(x) = x² + x\nF(3) = 9+3 = 12\nF(1) = 1+1 = 2\nIntegral = 12-2 = 10" },
+    ]},
+]},
+{ id:"c4", num:"4", title:"Lineare Algebra", subs:[
+  { id:"4.1", title:"Lineare Gleichungssysteme",
+    theory:{
+      intro:"Mehrere Gleichungen mit mehreren Variablen; die Lösung muss alle Gleichungen gleichzeitig erfüllen.",
+      blocks:[
+        { h:"Lösungsverfahren (2 Gl./2 Unbekannte)", f:"Gleichsetzungsverfahren: beide Gleichungen nach derselben Variable auflösen, dann gleichsetzen.\nEinsetzungsverfahren: eine Gleichung nach einer Variable auflösen, in die andere einsetzen.\nAdditionsverfahren: Gleichungen so multiplizieren, dass sich beim Addieren eine Variable aufhebt." },
+        { h:"Gauß-Algorithmus (3+ Variablen)", f:"Erlaubte Umformungen: Zeilen vertauschen, Zeile mit Faktor≠0 multiplizieren,\nVielfaches einer Zeile zu einer anderen addieren.\nZiel: Dreiecksform, dann von unten nach oben einsetzen." },
+      ],
+      example:{ title:"Additionsverfahren", body:"(I) 5x+4y=28   (II) 6x-6y=12\n(I)·3: 15x+12y=84 ; (II)·2: 12x-12y=24\nAddieren: 27x=108 → x=4\nin (I): 20+4y=28 → y=2 → S(4/2)" },
+      merke:"Wähle das Verfahren, das am wenigsten Brüche erzeugt – meist ist das Additionsverfahren am schnellsten."
+    },
+    cards:[
+      { f:"Löse mit dem Additionsverfahren:\n(I) 5x + 4y = 28\n(II) 6x - 6y = 12", h:"So multiplizieren, dass sich beim Addieren eine Variable aufhebt (hier: y).", l:"S(4/2)", w:"(I)·3:  15x+12y=84\n(II)·2: 12x-12y=24\nAddieren: 27x=108 → x=4\nin (I): 20+4y=28 → y=2\nLösung: S(4/2)" },
+      { f:"Löse mit dem Additionsverfahren:\n(I) 3x + 2y = 16\n(II) x - 2y = -8", h:"Addiere (I) und (II) direkt — y hebt sich sofort auf.", l:"S(2/5)", w:"(I)+(II): 4x = 8 → x=2\nin (II): 2-2y=-8 → y=5\nLösung: S(2/5)" },
+      { f:"Löse mit dem Gauß-Algorithmus:\n(I) 2x+y=1,30\n(II) 5x+2y+4z=3,70\n(III) 4x+3y+2z=3,70", h:"Eliminiere x aus (II) und (III) mit Vielfachen von (I), dann y eliminieren.", l:"x=0,30 / y=0,70 / z=0,20", w:"(II)-2,5·(I): -0,5y+4z=0,45 → -y+8z=0,9\n(III)-2·(I): y+2z=1,10\nAddieren: 10z=2 → z=0,2\n-y+1,6=0,9 → y=0,7\n2x+0,7=1,3 → x=0,3\nLösung: x=0,30 / y=0,70 / z=0,20" },
+      { f:"Löse mit dem Einsetzungsverfahren:\n(I) 3x + y = 5\n(II) 5x + 3y = 3", h:"(I) nach y auflösen, in (II) einsetzen.", l:"S(3/-4)", w:"aus (I): y = 5-3x\nin (II): 5x+3(5-3x)=3 → 5x+15-9x=3 → -4x=-12 → x=3\ny = 5-3·3 = -4\nLösung: S(3/-4)" },
+      { f:"Löse mit dem Gleichsetzungsverfahren:\n(I) 3y - 6x = 12\n(II) 5y + 10x = 20", h:"Beide Gleichungen nach y auflösen, dann gleichsetzen.", l:"S(0/4)", w:"aus (I): y = 4+2x\naus (II): y = 4-2x\ngleichsetzen: 4+2x = 4-2x → 4x=0 → x=0\ny = 4\nLösung: S(0/4)" },
+    ]},
+  { id:"4.2", title:"Matrizen",
+    theory:{
+      intro:"Matrizen fassen Zahlen tabellarisch zusammen. Grundrechenarten: Addition, Skalarmultiplikation, Matrizenmultiplikation, Transponieren, Invertieren.",
+      blocks:[
+        { h:"Grundrechenarten", f:"Addition/Subtraktion: nur bei gleichem Typ, elementweise\nSkalarmultiplikation: jedes Element mit dem Faktor multiplizieren\nMultiplikation A·B: nur möglich wenn Spaltenzahl(A)=Zeilenzahl(B)\n  → „Zeile mal Spalte“: Zeile von A mit Spalte von B multiplizieren, aufsummieren\nTransponierte Aᵀ: Zeilen und Spalten vertauscht\nAchtung: A·B ist im Allgemeinen NICHT gleich B·A" },
+        { h:"Inverse Matrix (Gauß-Jordan)", f:"Es muss gelten: A · A⁻¹ = E (Einheitsmatrix)\nVorgehen: [A|E] aufstellen, A durch Zeilenumformungen zur Einheitsmatrix machen\n→ rechts steht dann A⁻¹" },
+      ],
+      example:{ title:"Inverse einer 2x2-Matrix", body:"A=[[2,3],[1,2]]\n[A|E]: 2 3|1 0 / 1 2|0 1\nnach Umformung: A⁻¹=[[2,-3],[-1,2]]\nProbe: A·A⁻¹=E ✓" },
+      merke:"Multipliziere Matrizen immer „Zeile mal Spalte“ und prüfe zuerst, ob die Dimensionen überhaupt zueinander passen."
+    },
+    cards:[
+      { f:"A ist eine 2×3-Matrix, B eine 3×1-Matrix. Ist A·B möglich? Welche Größe hat das Ergebnis?", h:"Spaltenzahl von A muss Zeilenzahl von B entsprechen.", l:"Ja, möglich; Ergebnis ist eine 2×1-Matrix.", w:"Ja, möglich, da Spalten(A)=3=Zeilen(B).\nErgebnis A·B ist eine 2×1-Matrix." },
+      { f:"Gegeben A=[[1,2],[3,4]]. Bestimme A^T (Transponierte) und berechne A·A^T.", h:"Transponieren = Zeilen/Spalten tauschen, dann normal multiplizieren (Zeile mal Spalte).", l:"A·A^T = [[5,11],[11,25]] (symmetrisch)", w:"A^T = [[1,3],[2,4]]\nA·A^T = [[1·1+2·2, 1·3+2·4],[3·1+4·2, 3·3+4·4]]\n= [[5,11],[11,25]]\n→ A·A^T ist immer symmetrisch." },
+      { f:"Bestimme die Inverse von A = [[2,3],[1,2]] mit dem Gauß-Jordan-Algorithmus.\nPrüfe kurz das Ergebnis.", h:"[A|E] aufstellen, A durch Zeilenumformungen zur Einheitsmatrix machen.", l:"A⁻¹ = [[2,-3],[-1,2]]", w:"[A|E]:\n2 3 | 1 0\n1 2 | 0 1\n→ nach Umformung: A⁻¹ = [[2,-3],[-1,2]]\nProbe: A·A⁻¹ = [[2·2+3·(-1), 2·(-3)+3·2],[1·2+2·(-1), 1·(-3)+2·2]] = [[1,0],[0,1]] ✓" },
+      { f:"Gegeben A=[[2,0],[1,3]] und B=[[1,4],[2,1]]. Berechne A+B und 2·A.", h:"Addition elementweise, Skalarmultiplikation jedes Element.", l:"A+B = [[3,4],[3,4]],   2·A = [[4,0],[2,6]]", w:"A+B = [[3,4],[3,4]]\n2·A = [[4,0],[2,6]]" },
+      { f:"Berechne A·B für A=[[1,2],[0,1]] und B=[[3,1],[2,4]] (Falk-Schema / Zeile mal Spalte).", h:"Element (1,1) = Zeile1(A)·Spalte1(B), usw.", l:"A·B = [[7,9],[2,4]]", w:"A·B = [[1·3+2·2, 1·1+2·4],[0·3+1·2, 0·1+1·4]]\n= [[7,9],[2,4]]" },
+    ]},
+  { id:"4.3", title:"Lineare Optimierung",
+    theory:{
+      intro:"Ziel ist die Maximierung/Minimierung einer Zielfunktion unter Nebenbedingungen (Ungleichungen). Bei 2 Variablen grafisch, bei mehr Variablen mit dem Simplex-Algorithmus.",
+      blocks:[
+        { h:"Grafische Lösung (2 Variablen)", f:"1) Nebenbedingungen als Geraden zeichnen (Achsenabschnitte berechnen)\n2) zulässigen Bereich (Polygon) bestimmen\n3) alle Eckpunkte in die Zielfunktion einsetzen — bester Wert = Optimum" },
+        { h:"Simplex-Algorithmus", f:"Ungleichung 5x+4y≤400 wird mit Schlupfvariable zur Gleichung: 5x+4y+s=400\nPivotspalte: negativstes Element der Zielzeile\nPivotzeile: kleinster nicht-negativer Quotient (Kapazität / Pivotspalten-Element)\nfertig, wenn Zielfunktionszeile keine negativen Werte mehr enthält" },
+      ],
+      example:{ title:"Grafische Optimierung", body:"Zielfunktion G=1,5A+2B → Max\nNebenbed.: 5A+4B≤400 ; 3A+6B≤420 ; 6A≤360\nEckpunkte: (0/0),(60/0),(60/25),(40/50),(0/70)\nG(40/50)=160 → größter Wert → Optimum bei (40/50)" },
+      merke:"Beim Simplex zuerst ALLE Ungleichungen mit eigener Schlupfvariable versehen — eine pro Nebenbedingung."
+    },
+    cards:[
+      { f:"Nebenbedingungen: 5A+4B≤400, 3A+6B≤420, 6A≤360, A,B≥0.\nZielfunktion G=1,5A+2B → Max.\nEckpunkte des zulässigen Bereichs: (0/0),(60/0),(60/25),(40/50),(0/70).\nWelcher Punkt ist optimal?", h:"Jeden Eckpunkt in die Zielfunktion einsetzen, größten Wert suchen.", l:"Optimum bei (40/50) mit Gewinn G=160.", w:"G(60/25) = 1,5·60+2·25 = 140\nG(40/50) = 1,5·40+2·50 = 160\nG(0/70)  = 2·70 = 140\n→ Optimum bei (40/50) mit Gewinn G=160" },
+      { f:"Formuliere die Nebenbedingung „3 Maschinenstunden A + 2 Maschinenstunden B ≤ 240“ als Gleichung mit Schlupfvariable.", h:"Schlupfvariable macht aus ≤ eine Gleichung.", l:"3A + 2B + s = 240", w:"3A + 2B + s = 240\n(s = ungenutzte Kapazität, s ≥ 0)" },
+      { f:"Beschreibe kurz, wann der Simplex-Algorithmus (Tableau-Methode) fertig ist / das Optimum erreicht ist.", h:"Blick auf die Zielfunktionszeile im Tableau.", l:"Sobald die Zielfunktionszeile keine negativen Werte mehr enthält.", w:"Der Algorithmus ist fertig, sobald die Zielfunktionszeile im Simplex-Tableau\nkeine negativen Werte mehr enthält — dann ist das Optimum erreicht." },
+      { f:"Berechne die Achsenabschnitte der Nebenbedingung 5A+4B=400 (für A=0 und für B=0).", h:"Jeweils eine Variable = 0 setzen und nach der anderen auflösen.", l:"Achsenabschnitte bei (0/100) und (80/0).", w:"A=0: 4B=400 → B=100\nB=0: 5A=400 → A=80\n→ Gerade schneidet die Achsen bei (0/100) und (80/0)" },
+      { f:"Eine Firma produziert Produkt A (Gewinn 3€/Stück) und B (Gewinn 5€/Stück).\nNebenbedingungen: 2A+4B≤160, A+B≤50, A,B≥0.\nEckpunkte: (0/0),(50/0),(30/20),(0/40). Bestimme das Gewinnoptimum.", h:"Alle Eckpunkte in G=3A+5B einsetzen.", l:"Optimum bei (0/40) mit Gewinn 200€ (nur Produkt B herstellen).", w:"G(50/0)=150\nG(30/20)=90+100=190\nG(0/40)=200\n→ Optimum bei (0/40) mit Gewinn 200€ (nur Produkt B herstellen)" },
+    ]},
+]},
+];
+
+/* =====================================================================
+   STATE / STORAGE
+   ===================================================================== */
+const STORAGE_KEY = "karteikasten_wima_v2";
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const parsed = JSON.parse(raw);
+      if(!parsed.settings) parsed.settings = { alwaysRechenweg:false };
+      return parsed;
+    }
+  }catch(e){}
+  return { cards:{}, settings:{ alwaysRechenweg:false } };
+}
+function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+let state = loadState();
+
+/* global settings toggle: "Rechenweg immer zeigen" */
+function initSettingsToggle(){
+  const el = document.getElementById("toggleRechenweg");
+  el.classList.toggle("on", !!state.settings.alwaysRechenweg);
+  el.addEventListener("click", ()=>{
+    state.settings.alwaysRechenweg = !state.settings.alwaysRechenweg;
+    saveState();
+    el.classList.toggle("on", state.settings.alwaysRechenweg);
+  });
+}
+
+const allCards = [];
+DATA.forEach(ch => ch.subs.forEach(sub => sub.cards.forEach((c,i) => {
+  const id = ch.id+"_"+sub.id+"_"+i;
+  allCards.push({ id, chapter:ch, sub, ...c });
+})));
+
+function statusOf(id){ return state.cards[id] || null; }
+function setStatus(id, s){ state.cards[id]=s; saveState(); }
+
+function subStats(sub, ch){
+  const ids = sub.cards.map((c,i)=>ch.id+"_"+sub.id+"_"+i);
+  const done = ids.filter(id=>statusOf(id)==="good").length;
+  return { total: ids.length, done };
+}
+function chapterStats(ch){
+  let total=0, done=0;
+  ch.subs.forEach(sub=>{ const s=subStats(sub,ch); total+=s.total; done+=s.done; });
+  return { total, done };
+}
+function overallStats(){
+  let total=allCards.length, done=Object.values(state.cards).filter(s=>s==="good").length;
+  return { total, done };
+}
+function updateHeaderProgress(){
+  const {total,done} = overallStats();
+  const pct = total? Math.round(done/total*100):0;
+  document.getElementById("overallPct").textContent = pct+"%";
+  const circumference = 2*Math.PI*15.5;
+  const fg = document.getElementById("ringFg");
+  fg.setAttribute("stroke-dasharray", circumference.toFixed(1));
+  fg.setAttribute("stroke-dashoffset", (circumference*(1-pct/100)).toFixed(1));
+}
+
+/* =====================================================================
+   VIEW SWITCHING
+   ===================================================================== */
+function showView(id){
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  window.scrollTo({top:0, behavior:"instant"});
+}
+
+/* =====================================================================
+   RENDER: Overview
+   ===================================================================== */
+const chaptersEl = document.getElementById("chapters");
+
+function renderOverview(){
+  chaptersEl.innerHTML = "";
+  DATA.forEach(ch=>{
+    const stats = chapterStats(ch);
+    const pct = stats.total? Math.round(stats.done/stats.total*100):0;
+    const wrap = document.createElement("div");
+    wrap.className = "chapter";
+    wrap.innerHTML = `
+      <div class="chapter-head">
+        <div class="tab-num">${ch.num}</div>
+        <div class="chapter-info">
+          <h2>${ch.title}</h2>
+          <div class="chapter-bar"><span style="width:${pct}%"></span></div>
+          <div class="chapter-meta">${stats.done} / ${stats.total} Karten gemeistert · ${pct}%</div>
+        </div>
+        <svg class="chev" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="subtopics"><div class="subtopics-inner"></div></div>
+    `;
+    const head = wrap.querySelector(".chapter-head");
+    head.addEventListener("click", ()=>{
+      const isOpen = wrap.classList.contains("open");
+      document.querySelectorAll(".chapter.open").forEach(o=>{
+        if(o!==wrap){ o.classList.remove("open"); o.querySelector(".subtopics").style.maxHeight=null; }
+      });
+      wrap.classList.toggle("open", !isOpen);
+      const sub = wrap.querySelector(".subtopics");
+      sub.style.maxHeight = wrap.classList.contains("open") ? sub.scrollHeight+"px" : null;
+    });
+
+    const inner = wrap.querySelector(".subtopics-inner");
+    ch.subs.forEach(sub=>{
+      const s = subStats(sub, ch);
+      const done = s.done===s.total && s.total>0;
+      const card = document.createElement("div");
+      card.className = "sub-card"+(done?" done":"");
+      card.innerHTML = `
+        <h3>${sub.id} ${sub.title}</h3>
+        <div class="sub-progress">
+          <div class="bar"><span style="width:${s.total? s.done/s.total*100:0}%"></span></div>
+          <div class="count">${s.done}/${s.total}</div>
+        </div>
+      `;
+      card.addEventListener("click", (e)=>{ e.stopPropagation(); openTopic(ch, sub); });
+      inner.appendChild(card);
+    });
+
+    chaptersEl.appendChild(wrap);
+  });
+  updateHeaderProgress();
+}
+
+/* =====================================================================
+   RENDER: Topic detail (Theorie + CTA)
+   ===================================================================== */
+function openTopic(ch, sub){
+  const el = document.getElementById("view-topic");
+  const s = subStats(sub, ch);
+  const t = sub.theory;
+
+  let blocksHtml = (t.blocks||[]).map(b => `
+    <h4>${b.h}</h4>
+    <div class="formula-box">${escapeHtml(b.f)}</div>
+  `).join("");
+
+  let exampleHtml = t.example ? `
+    <h4>Durchgerechnetes Beispiel</h4>
+    <div class="example-box">
+      <div class="ex-title">${escapeHtml(t.example.title)}</div>
+      <div class="ex-body">${escapeHtml(t.example.body)}</div>
+    </div>
+  ` : "";
+
+  let merkeHtml = t.merke ? `<div class="merksatz"><b>Merke:</b> ${escapeHtml(t.merke)}</div>` : "";
+
+  el.innerHTML = `
+    <div class="topic-header">
+      <button class="back-btn" id="topicBack">← Zurück zum Karteikasten</button>
+    </div>
+    <div class="topic-eyebrow">Kapitel ${ch.num} · ${ch.title}</div>
+    <h1 class="topic-title">${sub.id} ${sub.title}</h1>
+    <div class="theory-block">
+      <p class="intro">${escapeHtml(t.intro)}</p>
+      ${blocksHtml}
+      ${exampleHtml}
+      ${merkeHtml}
+    </div>
+    <div class="topic-cta">
+      <div class="l">
+        <span class="t">Jetzt üben</span>
+        <span class="d">${s.done}/${s.total} Aufgaben bereits gemeistert</span>
+      </div>
+      <button id="topicStart">${s.done>0 ? "Weiter üben →" : "Aufgaben starten →"}</button>
+    </div>
+  `;
+  el.querySelector("#topicBack").addEventListener("click", ()=>{ renderOverview(); showView("view-overview"); });
+  el.querySelector("#topicStart").addEventListener("click", ()=> startSession(ch, sub));
+  showView("view-topic");
+}
+
+function escapeHtml(str){
+  return String(str)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+/* =====================================================================
+   PRACTICE SESSION
+   ===================================================================== */
+let session = { cards:[], index:0, title:"", eyebrow:"", results:[], returnTo:"overview" };
+
+function practiceShell(){
+  return `
+    <div class="practice-top">
+      <button class="back-btn" id="btnBack">← Zurück</button>
+      <div class="dots" id="dots"></div>
+    </div>
+    <div class="session-title">
+      <div class="eyebrow" id="sessEyebrow">Thema</div>
+      <h2 id="sessTitle">—</h2>
+    </div>
+    <div id="cardStageWrap">
+      <div class="card-stage">
+        <div class="flipcard" id="flipcard">
+          <div class="face front">
+            <div class="kicker"><span class="chip">Aufgabe</span><span id="cardIndex"></span></div>
+            <div class="face-body" id="frageText"></div>
+            <div class="hint" id="hintBox"></div>
+            <div class="face-controls">
+              <button class="ghost-btn" id="btnHint">💡 Tipp</button>
+              <button class="flip-btn" id="btnFlip">Lösung zeigen →</button>
+            </div>
+          </div>
+          <div class="face back">
+            <div class="kicker"><span class="chip">Lösung</span><button class="kicker-back-btn" id="btnFlipBack">← zur Frage</button></div>
+            <div class="face-body">
+              <div class="frage-recap" id="frageRecap"></div>
+              <div class="loesung-kurz" id="loesungText"></div>
+              <div class="rechenweg-wrap">
+                <button class="rechenweg-toggle" id="btnRechenweg">🧮 Rechenweg anzeigen</button>
+                <div class="rechenweg-box" id="rechenwegBox"></div>
+              </div>
+            </div>
+            <div class="judge-row">
+              <button class="judge-btn again" id="btnAgain">↺ Nochmal üben</button>
+              <button class="judge-btn good" id="btnGood">✓ Gewusst</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="session-done" id="sessionDone" style="display:none;">
+      <div class="badge">✓</div>
+      <h2>Stapel geschafft</h2>
+      <p id="sessionDoneText"></p>
+      <div class="actions">
+        <button class="ghost-btn" id="btnRepeatAgain">Falsche nochmal</button>
+        <button class="primary-btn" id="btnToMap">Zurück zum Karteikasten</button>
+      </div>
+    </div>
+  `;
+}
+
+function startSession(ch, sub){
+  session = {
+    cards: sub.cards.map((c,i)=>({ id: ch.id+"_"+sub.id+"_"+i, ...c })),
+    index: 0,
+    title: sub.title,
+    eyebrow: `Kapitel ${ch.num} · ${ch.title}`,
+    results: [],
+    returnTo: "topic", ch, sub
+  };
+  openPractice();
+}
+function startContinue(){
+  const pending = allCards.filter(c=>statusOf(c.id)!=="good");
+  if(pending.length===0){ alert("Alles gemeistert! Starte gern eine Wiederholungsrunde über „Nur Wiederholungen“."); return; }
+  session = { cards: pending, index:0, title:"Weiter üben", eyebrow:"Alle offenen Karten", results:[], returnTo:"overview" };
+  openPractice();
+}
+function startWrongOnly(){
+  const wrong = allCards.filter(c=>statusOf(c.id)==="again");
+  if(wrong.length===0){ alert("Keine Karten als „nochmal“ markiert — stark!"); return; }
+  session = { cards: wrong, index:0, title:"Wiederholungen", eyebrow:"Als „nochmal“ markiert", results:[], returnTo:"overview" };
+  openPractice();
+}
+
+function openPractice(){
+  const el = document.getElementById("view-practice");
+  el.innerHTML = practiceShell();
+  document.getElementById("sessTitle").textContent = session.title;
+  document.getElementById("sessEyebrow").textContent = session.eyebrow;
+  document.getElementById("btnBack").addEventListener("click", closePractice);
+  document.getElementById("btnToMap").addEventListener("click", closePractice);
+  document.getElementById("btnHint").addEventListener("click", ()=>{
+    document.getElementById("hintBox").classList.toggle("show");
+  });
+  document.getElementById("btnFlip").addEventListener("click", ()=>{
+    document.getElementById("flipcard").classList.add("flipped");
+  });
+  document.getElementById("btnFlipBack").addEventListener("click", ()=>{
+    document.getElementById("flipcard").classList.remove("flipped");
+  });
+  document.getElementById("btnRechenweg").addEventListener("click", ()=>{
+    const box = document.getElementById("rechenwegBox");
+    const btn = document.getElementById("btnRechenweg");
+    const nowShown = box.classList.toggle("show");
+    btn.textContent = nowShown ? "🧮 Rechenweg verbergen" : "🧮 Rechenweg anzeigen";
+  });
+  document.getElementById("btnAgain").addEventListener("click", ()=>judge("again"));
+  document.getElementById("btnGood").addEventListener("click", ()=>judge("good"));
+  document.getElementById("btnRepeatAgain").addEventListener("click", repeatAgain);
+  renderCard();
+  showView("view-practice");
+}
+function closePractice(){
+  if(session.returnTo==="topic" && session.ch && session.sub){
+    openTopic(session.ch, session.sub);
+  } else {
+    renderOverview();
+    showView("view-overview");
+  }
+  updateHeaderProgress();
+}
+
+function renderDots(){
+  const dotsEl = document.getElementById("dots");
+  dotsEl.innerHTML = "";
+  session.cards.forEach((c,i)=>{
+    const d = document.createElement("div");
+    let cls = "dot";
+    if(i===session.index) cls+=" current";
+    else if(session.results[i]==="good") cls+=" good";
+    else if(session.results[i]==="again") cls+=" again";
+    d.className = cls;
+    dotsEl.appendChild(d);
+  });
+}
+
+function renderCard(){
+  if(session.index >= session.cards.length){ finishSession(); return; }
+  const flipcard = document.getElementById("flipcard");
+  flipcard.classList.remove("flipped");
+  const c = session.cards[session.index];
+  document.getElementById("cardIndex").textContent = `${session.index+1} / ${session.cards.length}`;
+  document.getElementById("frageText").textContent = c.f;
+  document.getElementById("frageRecap").textContent = c.f;
+  document.getElementById("loesungText").textContent = c.l;
+  const hintBox = document.getElementById("hintBox");
+  hintBox.textContent = c.h || "";
+  hintBox.classList.remove("show");
+
+  const box = document.getElementById("rechenwegBox");
+  const btn = document.getElementById("btnRechenweg");
+  box.textContent = c.w || c.l;
+  const alwaysOn = !!state.settings.alwaysRechenweg;
+  box.classList.toggle("show", alwaysOn);
+  btn.textContent = alwaysOn ? "🧮 Rechenweg verbergen" : "🧮 Rechenweg anzeigen";
+
+  renderDots();
+}
+
+function judge(result){
+  const c = session.cards[session.index];
+  setStatus(c.id, result);
+  session.results[session.index] = result;
+  session.index++;
+  renderCard();
+  updateHeaderProgress();
+}
+
+function finishSession(){
+  document.getElementById("cardStageWrap").style.display = "none";
+  const doneEl = document.getElementById("sessionDone");
+  doneEl.style.display = "block";
+  const goodCount = session.results.filter(r=>r==="good").length;
+  const againCount = session.results.filter(r=>r==="again").length;
+  document.getElementById("sessionDoneText").textContent =
+    `${goodCount} gewusst · ${againCount} zum Wiederholen markiert.`;
+  document.getElementById("btnRepeatAgain").style.display = againCount>0 ? "inline-flex":"none";
+  updateHeaderProgress();
+}
+function repeatAgain(){
+  const again = session.cards.filter((c,i)=>session.results[i]==="again");
+  session = { ...session, cards: again, index:0, title: session.title+" (Wiederholung)", results:[] };
+  document.getElementById("cardStageWrap").style.display="block";
+  document.getElementById("sessionDone").style.display="none";
+  renderCard();
+}
+
+document.getElementById("btnContinue").addEventListener("click", startContinue);
+document.getElementById("btnWrong").addEventListener("click", startWrongOnly);
+
+/* =====================================================================
+   FORMELSAMMLUNG (full reference view)
+   ===================================================================== */
+function renderFormeln(){
+  const el = document.getElementById("view-formeln");
+  let html = `
+    <div class="topic-header">
+      <button class="back-btn" id="formelnBack">← Zurück zum Karteikasten</button>
+    </div>
+    <h1 class="topic-title">Formelsammlung &amp; Stoffzusammenfassung</h1>
+    <input type="text" class="formeln-search" id="formelnSearch" placeholder="Suche z.B. „Rentenbarwert“, „Ableitung“, „Simplex“ …">
+    <div id="formelnContent"></div>
+  `;
+  el.innerHTML = html;
+  el.querySelector("#formelnBack").addEventListener("click", ()=>{ renderOverview(); showView("view-overview"); });
+
+  const contentEl = el.querySelector("#formelnContent");
+  DATA.forEach(ch=>{
+    const chDiv = document.createElement("div");
+    chDiv.className = "formeln-chapter";
+    chDiv.dataset.search = (ch.title).toLowerCase();
+    let subsHtml = "";
+    ch.subs.forEach(sub=>{
+      const t = sub.theory;
+      const blocksHtml = (t.blocks||[]).map(b=>`<div class="formula-box">${escapeHtml(b.f)}</div>`).join("");
+      const exampleHtml = t.example ? `<div class="example-box"><div class="ex-title">${escapeHtml(t.example.title)}</div><div class="ex-body">${escapeHtml(t.example.body)}</div></div>` : "";
+      const merkeHtml = t.merke ? `<div class="merksatz"><b>Merke:</b> ${escapeHtml(t.merke)}</div>` : "";
+      const searchText = (sub.title+" "+t.intro+" "+(t.blocks||[]).map(b=>b.h+" "+b.f).join(" ")+" "+(t.example?t.example.title+" "+t.example.body:"")).toLowerCase();
+      subsHtml += `
+        <div class="formeln-sub" data-search="${escapeHtml(searchText)}">
+          <h3>${sub.id} ${sub.title}</h3>
+          <p class="intro" style="font-size:13.5px;color:var(--muted);margin:0 0 10px;">${escapeHtml(t.intro)}</p>
+          ${blocksHtml}
+          ${exampleHtml}
+          ${merkeHtml}
+        </div>
+      `;
+    });
+    chDiv.innerHTML = `<h2>${ch.num}. ${ch.title}</h2>${subsHtml}`;
+    contentEl.appendChild(chDiv);
+  });
+
+  const searchInput = el.querySelector("#formelnSearch");
+  searchInput.addEventListener("input", ()=>{
+    const q = searchInput.value.trim().toLowerCase();
+    contentEl.querySelectorAll(".formeln-sub").forEach(subEl=>{
+      const match = q==="" || subEl.dataset.search.includes(q);
+      subEl.classList.toggle("hidden", !match);
+    });
+    contentEl.querySelectorAll(".formeln-chapter").forEach(chEl=>{
+      const anyVisible = [...chEl.querySelectorAll(".formeln-sub")].some(s=>!s.classList.contains("hidden"));
+      chEl.classList.toggle("hidden", !anyVisible);
+    });
+  });
+}
+
+document.getElementById("navFormelsammlung").addEventListener("click", ()=>{
+  renderFormeln();
+  showView("view-formeln");
+});
+
+/* init */
+initSettingsToggle();
+renderOverview();
+</script>
+</body>
+</html>
