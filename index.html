@@ -507,6 +507,12 @@ function sign0(coef, varStr){
 function bmatrix(m){
   return "\\begin{bmatrix}" + m.map(row=>row.join(" & ")).join(" \\\\ ") + "\\end{bmatrix}";
 }
+const SYM_ZINS = "Dabei: $K_0$ = Anfangskapital, $K_n$ = Endkapital nach $n$ Jahren, $p$ = Zinssatz in %, $q = 1+\\frac{p}{100}$ = Aufzinsungsfaktor, $n$ = Laufzeit in Jahren";
+const SYM_RENTE = "Dabei: $r$ = jährliche Rate (Rente), $R_n$ = Rentenendwert (Wert aller Raten am ENDE der Laufzeit), $R_0$ = Rentenbarwert (heutiger Wert), $q = 1+\\frac{p}{100}$, $n$ = Anzahl der Raten/Jahre";
+const SYM_TILG = "Dabei: $K_0$ = Kreditsumme, $T$ = Tilgungsrate, $A$ = Annuität (Zins+Tilgung), $Z_m$ = Zinsen im Jahr $m$, $K_m$ = Restschuld nach $m$ Jahren, $q = 1+\\frac{p}{100}$";
+const SYM_MV = "Dabei: $f'_{x_1}, f'_{x_2}$ = partielle Ableitungen (nur nach EINER Variable ableiten, andere als Konstante behandeln); $f''_{x_1x_1}$ etc. = zweite partielle Ableitungen";
+const SYM_INT = "Dabei: $F(x)$ = Stammfunktion (es gilt $F'(x)=f(x)$), $C$ = Integrationskonstante, $\\int$ = Integralzeichen";
+
 const DATA = [
 { id:"c1", num:"1", title:"Allgemeine Grundlagen", subs:[
   { id:"1.1", title:"Aussagenlogik",
@@ -618,7 +624,7 @@ const DATA = [
       f:`$K_0 = ${mInt(K0)}$ €, $p = ${p}\\%$, $n = ${n}$ Jahre, Zinseszins.\nBerechne das Endkapital $K_{${n}}$.`,
       h:"$K_n = K_0 \\cdot q^n$ mit $q=1+\\frac{p}{100}$",
       l:`$K_{${n}} = ${mNum(Kn)}$ €`,
-      w:`$q = ${mQ(p)}$\n$K_{${n}} = ${mInt(K0)} \\cdot ${mQ(p)}^{${n}}$\n$K_{${n}} = ${mNum(Kn)}$ €`
+      w:`Formel: $K_n = K_0 \\cdot q^n$\n${SYM_ZINS}\nSchritt 1 – Aufzinsungsfaktor: $q = 1+\\frac{${p}}{100} = ${mQ(p)}$\nSchritt 2 – Einsetzen: $K_{${n}} = ${mInt(K0)} \\cdot ${mQ(p)}^{${n}}$\nErgebnis: $K_{${n}} = ${mNum(Kn)}$ €`
     };
   }),
       (function(){
@@ -632,7 +638,7 @@ const DATA = [
       f:`Ein Kapital von ${deInt(K0)} € soll in ${n} Jahren auf ${deInt(Kn)} € anwachsen.\nWelcher Zinssatz $p$ ist dafür nötig?`,
       h:"$q^n = K_n/K_0$, dann $n$-te Wurzel ziehen.",
       l:`$p = ${de(p)}\\%$`,
-      w:`$q^{${n}} = \\dfrac{${mInt(Kn)}}{${mInt(K0)}} = ${mNum(q,4)}$\n$q = \\sqrt[${n}]{${mNum(q,4)}} = ${mNum(Math.pow(q,1/n),4)}$\n$p = (q-1)\\cdot 100 = ${mNum(p)}\\%$`
+      w:`Formel: $K_n = K_0 \\cdot q^n$, umgestellt nach $q$: $q = \\sqrt[n]{\\dfrac{K_n}{K_0}}$\n${SYM_ZINS}\nSchritt 1 – Verhältnis bilden: $q^{${n}} = \\dfrac{${mInt(Kn)}}{${mInt(K0)}} = ${mNum(q,4)}$\nSchritt 2 – $n$-te Wurzel: $q = \\sqrt[${n}]{${mNum(q,4)}} = ${mNum(Math.pow(q,1/n),4)}$\nSchritt 3 – Zinssatz: $p = (q-1)\\cdot 100$\nErgebnis: $p = ${mNum(p)}\\%$`
     };
   }),
       (function(){
@@ -646,7 +652,7 @@ const DATA = [
       f:`$K_0 = ${mInt(K0)}$ €, $p = ${p}\\%$ p.a., ${mText} Verzinsung ($m=${m}$), $n=1$ Jahr.\nBerechne $K_1$ und den effektiven Jahreszins.`,
       h:"$K_n = K_0\\cdot\\left(1+\\dfrac{p}{100\\cdot m}\\right)^{m\\cdot n}$",
       l:`$K_1 = ${mNum(K1)}$ €, effektiver Jahreszins $= ${mNum(eff)}\\%$`,
-      w:`$K_1 = ${mInt(K0)} \\cdot \\left(1+\\dfrac{${p}}{${100*m}}\\right)^{${m}} = ${mNum(K1)}$ €\neffektiver Zins $= \\left(\\dfrac{${mNum(K1)}}{${mInt(K0)}} - 1\\right)\\cdot 100 = ${mNum(eff)}\\%$\n(größer als der Nominalzins ${p}\\%, da unterjährig verzinst wird)`
+      w:`Formel: $K_n = K_0\\cdot\\left(1+\\dfrac{p}{100\\cdot m}\\right)^{m\\cdot n}$\nDabei: $m$ = Anzahl der Zinsperioden pro Jahr (hier ${m} wegen ${mText}r Verzinsung), $p$ = Nominalzins p.a., $n$ = Jahre\nSchritt 1 – Periodenzins: $\\dfrac{p}{100\\cdot m} = \\dfrac{${p}}{${100*m}}$\nSchritt 2 – Einsetzen: $K_1 = ${mInt(K0)} \\cdot \\left(1+\\dfrac{${p}}{${100*m}}\\right)^{${m}\\cdot 1} = ${mNum(K1)}$ €\nSchritt 3 – Effektivzins: $p_{eff} = \\left(\\dfrac{K_1}{K_0} - 1\\right)\\cdot 100 = \\left(\\dfrac{${mNum(K1)}}{${mInt(K0)}} - 1\\right)\\cdot 100 = ${mNum(eff)}\\%$\nMerke: Effektivzins $>$ Nominalzins (${p}\\%), da unterjährige Zinsen mitverzinst werden.`
     };
   }),
       (function(){
@@ -658,7 +664,7 @@ const DATA = [
       f:`In wie vielen Jahren verdoppelt sich ein Kapital bei $p = ${p}\\%$ Zinseszins?`,
       h:"$2 = q^n$, dann nach $n$ auflösen mit dem Logarithmus.",
       l:`Nach ${nCeil} Jahren ist das Kapital verdoppelt.`,
-      w:`$2 = ${mQ(p)}^n$\n$n = \\dfrac{\\log(2)}{\\log(${mQ(p)})} = ${mNum(nExact)}$\n$\\Rightarrow$ nach ${nCeil} Jahren`
+      w:`Formel: $K_n = K_0\\cdot q^n$; Verdopplung heißt $K_n = 2\\cdot K_0$, also $2 = q^n$\nNach $n$ auflösen (Logarithmusgesetz $\\log(q^n)=n\\cdot\\log(q)$): $n = \\dfrac{\\log(2)}{\\log(q)}$\nDabei: $q = 1+\\frac{p}{100} = ${mQ(p)}$, $n$ = gesuchte Laufzeit in Jahren\nEinsetzen: $n = \\dfrac{\\log(2)}{\\log(${mQ(p)})} = ${mNum(nExact)}$\nErgebnis: aufrunden $\\Rightarrow$ nach ${nCeil} Jahren ist das Kapital (mindestens) verdoppelt.`
     };
   }),
       (function(){
@@ -668,10 +674,10 @@ const DATA = [
     const Kn = round2(K0*(1+n*p/100));
     const pCalc = round2((Kn/K0-1)*100/n);
     return {
-      f:`Ein Sparbrief mit einfacher Verzinsung: aus ${deInt(K0)} € werden in ${n} Jahren ${de(Kn)} €.\nWelcher Zinssatz wurde vereinbart?`,
+      f:`Ein Sparbrief mit EINFACHER Verzinsung: aus ${deInt(K0)} € werden in ${n} Jahren ${de(Kn)} €.\nWelcher Zinssatz wurde vereinbart?`,
       h:"$K_n = K_0\\cdot\\left(1+\\dfrac{n\\cdot p}{100}\\right)$, nach $p$ auflösen.",
       l:`$p = ${de(pCalc)}\\%$`,
-      w:`$${mNum(Kn)} = ${mInt(K0)}\\cdot\\left(1+\\dfrac{${n}\\cdot p}{100}\\right)$\n$${mNum(Kn/K0,4)} = 1+\\dfrac{${n}p}{100}$\n$p = ${mNum(pCalc)}\\%$`
+      w:`Formel (einfache Verzinsung, Zinsen werden NICHT mitverzinst): $K_n = K_0\\cdot\\left(1+\\dfrac{n\\cdot p}{100}\\right)$\nDabei: $K_0$ = Anfangskapital, $K_n$ = Endkapital, $n$ = Jahre, $p$ = Zinssatz in %\nUmstellen nach $p$: $p = \\left(\\dfrac{K_n}{K_0}-1\\right)\\cdot\\dfrac{100}{n}$\nEinsetzen: $p = \\left(\\dfrac{${mNum(Kn)}}{${mInt(K0)}}-1\\right)\\cdot\\dfrac{100}{${n}} = ${mNum(Kn/K0-1,4)}\\cdot\\dfrac{100}{${n}}$\nErgebnis: $p = ${mNum(pCalc)}\\%$`
     };
   }),
       (function(){
@@ -689,7 +695,7 @@ const DATA = [
       f:`Zwei Angebote: Bank A verzinst ${deInt(K0)} € über ${n} Jahre mit ${p}\\% Zinseszins. Bank B zahlt nach ${n} Jahren pauschal ${de(KB)} € aus.\nWelches Angebot ist günstiger?`,
       h:`Berechne $K_{${n}}$ für Bank A und vergleiche direkt mit der Pauschalzahlung.`,
       l:verdict,
-      w:`Bank A: $K_{${n}} = ${mInt(K0)} \\cdot ${mQ(p)}^{${n}} = ${mNum(KA)}$ €\nBank B zahlt: $${mNum(KB)}$ €\n${verdict}`
+      w:`Prinzip: Beide Angebote auf denselben Zeitpunkt (Jahr ${n}) beziehen, dann direkt vergleichen.\nFormel für Bank A: $K_n = K_0 \\cdot q^n$ mit $q = 1+\\frac{p}{100} = ${mQ(p)}$\n${SYM_ZINS}\nBank A: $K_{${n}} = ${mInt(K0)} \\cdot ${mQ(p)}^{${n}} = ${mNum(KA)}$ €\nBank B zahlt: $${mNum(KB)}$ €\nVergleich: ${mNum(KA)} € vs. ${mNum(KB)} €\nErgebnis: ${verdict}`
     };
   }),
     ]},
@@ -714,7 +720,7 @@ const DATA = [
       f:`Sparvertrag: jährlich ${deInt(r)} €, ${n} Jahre, $p=${p}\\%$, nachschüssig.\nBerechne den Rentenendwert $R_{${n}}$.`,
       h:"$R_n = r \\cdot \\dfrac{q^n - 1}{q-1}$",
       l:`$R_{${n}} = ${mNum(Rn)}$ €`,
-      w:`$q = ${mQ(p)}$\n$R_{${n}} = ${mInt(r)} \\cdot \\dfrac{${mQ(p)}^{${n}} - 1}{${mNum(p/100,2)}}$\n$R_{${n}} = ${mNum(Rn)}$ €`
+      w:`Formel (nachschüssiger Rentenendwert): $R_n = r \\cdot \\dfrac{q^n - 1}{q-1}$\n${SYM_RENTE}\n„Nachschüssig“ = Zahlung am ENDE jeder Periode.\nSchritt 1: $q = 1+\\frac{${p}}{100} = ${mQ(p)}$, also $q-1 = ${mNum(p/100,2)}$\nSchritt 2 – Einsetzen: $R_{${n}} = ${mInt(r)} \\cdot \\dfrac{${mQ(p)}^{${n}} - 1}{${mNum(p/100,2)}}$\nSchritt 3: $${mQ(p)}^{${n}} = ${mNum(Math.pow(q,n),4)}$\nErgebnis: $R_{${n}} = ${mNum(Rn)}$ €`
     };
   }),
       (function(){
@@ -728,7 +734,7 @@ const DATA = [
       f:`Ein Sparvertrag zahlt jährlich ${deInt(r)} €, Laufzeit ${n} Jahre, $p=${p}\\%$, nachschüssig, mit einem Rentenendwert von $R_{${n}}=${de(Rn)}$ €.\nWie hoch ist der Rentenbarwert (heutiger Wert) dieser Rente?`,
       h:"$R_0 = R_n / q^n$",
       l:`$R_0 = ${mNum(R0)}$ €`,
-      w:`$q = ${mQ(p)}$\n$R_0 = \\dfrac{${mNum(Rn)}}{${mQ(p)}^{${n}}} = ${mNum(R0)}$ €`
+      w:`Formel (Barwert = Endwert abgezinst): $R_0 = \\dfrac{R_n}{q^n}$\n${SYM_RENTE}\nIdee: Der Endwert wird über $n$ Jahre „zurückgerechnet“ (abgezinst), um den heutigen Wert zu erhalten.\nSchritt 1: $q = ${mQ(p)}$, $q^{${n}} = ${mNum(Math.pow(q,n),4)}$\nSchritt 2 – Einsetzen: $R_0 = \\dfrac{${mNum(Rn)}}{${mNum(Math.pow(q,n),4)}}$\nErgebnis: $R_0 = ${mNum(R0)}$ €`
     };
   }),
       (function(){
@@ -742,7 +748,7 @@ const DATA = [
       f:`Sparvertrag jährlich ${deInt(r)} €, ${n} Jahre, $p=${p}\\%$, VORSCHÜSSIG.\nBerechne den Rentenendwert.`,
       h:"Vorschüssig $=$ nachschüssiger Wert $\\cdot\\, q$",
       l:`$R_{${n}}^{*} = ${mNum(RnV)}$ € (vorschüssig)`,
-      w:`nachschüssig: $R_{${n}} = ${mInt(r)}\\cdot\\dfrac{${mQ(p)}^{${n}}-1}{${mNum(p/100,2)}} = ${mNum(Rn)}$ €\nvorschüssig: $R_{${n}}^{*} = ${mNum(Rn)} \\cdot ${mQ(p)} = ${mNum(RnV)}$ €`
+      w:`Formel (vorschüssiger Rentenendwert): $R_n^{*} = r \\cdot q \\cdot \\dfrac{q^n - 1}{q-1}$\n${SYM_RENTE}\n„Vorschüssig“ = Zahlung am ANFANG jeder Periode $\\Rightarrow$ jede Rate wird 1 Jahr länger verzinst $\\Rightarrow$ Faktor $q$ zusätzlich.\nSchritt 1 – nachschüssiger Wert: $R_{${n}} = ${mInt(r)}\\cdot\\dfrac{${mQ(p)}^{${n}}-1}{${mNum(p/100,2)}} = ${mNum(Rn)}$ €\nSchritt 2 – mit $q$ multiplizieren: $R_{${n}}^{*} = ${mNum(Rn)} \\cdot ${mQ(p)}$\nErgebnis: $R_{${n}}^{*} = ${mNum(RnV)}$ €`
     };
   }),
       (function(){
@@ -755,7 +761,7 @@ const DATA = [
       f:`Welcher Betrag muss heute angelegt werden, um ${n} Jahre lang jährlich ${deInt(r)} € (nachschüssig) entnehmen zu können, bei $p=${p}\\%$?`,
       h:"$R_0 = r\\cdot\\dfrac{q^n-1}{q^n\\cdot(q-1)}$",
       l:`$R_0 = ${mNum(R0)}$ €`,
-      w:`$q = ${mQ(p)}$\n$R_0 = ${mInt(r)} \\cdot \\dfrac{${mQ(p)}^{${n}} - 1}{${mQ(p)}^{${n}} \\cdot ${mNum(p/100,2)}}$\n$R_0 = ${mNum(R0)}$ €`
+      w:`Formel (Rentenbarwert direkt): $R_0 = r\\cdot\\dfrac{q^n-1}{q^n\\cdot(q-1)}$\n${SYM_RENTE}\nIdee: Gesucht ist der HEUTIGE Betrag $R_0$, der genau ausreicht, um $n$ Raten der Höhe $r$ zu finanzieren.\nSchritt 1: $q = ${mQ(p)}$, $q^{${n}} = ${mNum(Math.pow(q,n),4)}$\nSchritt 2 – Einsetzen: $R_0 = ${mInt(r)} \\cdot \\dfrac{${mNum(Math.pow(q,n),4)} - 1}{${mNum(Math.pow(q,n),4)} \\cdot ${mNum(p/100,2)}}$\nErgebnis: $R_0 = ${mNum(R0)}$ €`
     };
   }),
       (function(){
@@ -768,7 +774,7 @@ const DATA = [
       f:`Welche jährliche nachschüssige Rate $r$ ergibt bei $p=${p}\\%$ und $n=${n}$ Jahren einen Rentenendwert von ${deInt(Rn)} €?`,
       h:"Formel nach $r$ umstellen: $r = R_n\\cdot\\dfrac{q-1}{q^n-1}$",
       l:`$r = ${mNum(r)}$ €`,
-      w:`$q = ${mQ(p)}$\n$r = ${mInt(Rn)} \\cdot \\dfrac{${mNum(p/100,2)}}{${mQ(p)}^{${n}} - 1}$\n$r = ${mNum(r)}$ €`
+      w:`Ausgangsformel: $R_n = r \\cdot \\dfrac{q^n-1}{q-1}$\nUmstellen nach $r$: $r = R_n\\cdot\\dfrac{q-1}{q^n-1}$\n${SYM_RENTE}\nSchritt 1: $q = ${mQ(p)}$, $q^{${n}} = ${mNum(Math.pow(q,n),4)}$\nSchritt 2 – Einsetzen: $r = ${mInt(Rn)} \\cdot \\dfrac{${mNum(p/100,2)}}{${mNum(Math.pow(q,n),4)} - 1}$\nErgebnis: $r = ${mNum(r)}$ € pro Jahr`
     };
   }),
       (function(){
@@ -783,7 +789,7 @@ const DATA = [
       f:`Vergleiche zwei Angebote für eine Abfindung: (1) sofort ${deInt(S)} € oder (2) ${n} Jahre lang jährlich nachschüssig ${deInt(r)} € bei $p=${p}\\%$.\nWelches Angebot ist mehr wert (Barwertvergleich)?`,
       h:"Rentenbarwert von Angebot 2 berechnen und mit der Sofortzahlung vergleichen.",
       l:`${verdict} (${de(S)} € vs. ${de(R0)} €).`,
-      w:`$R_0 = ${mInt(r)}\\cdot\\dfrac{${mQ(p)}^{${n}}-1}{${mQ(p)}^{${n}}\\cdot ${mNum(p/100,2)}} = ${mNum(R0)}$ €\n${verdict}, da ${S>R0? mNum(S)+"\\\\,€ > "+mNum(R0)+"\\\\,€" : mNum(R0)+"\\\\,€ > "+mNum(S)+"\\\\,€"}.`
+      w:`Prinzip: Beide Angebote auf HEUTE beziehen (Barwertvergleich). Die Sofortzahlung ist bereits ein Barwert.\nFormel für Angebot 2: $R_0 = r\\cdot\\dfrac{q^n-1}{q^n\\cdot(q-1)}$\n${SYM_RENTE}\nSchritt 1: $q = ${mQ(p)}$, $q^{${n}} = ${mNum(Math.pow(q,n),4)}$\nSchritt 2: $R_0 = ${mInt(r)}\\cdot\\dfrac{${mNum(Math.pow(q,n),4)}-1}{${mNum(Math.pow(q,n),4)}\\cdot ${mNum(p/100,2)}} = ${mNum(R0)}$ €\nVergleich: Angebot 1 $= ${mNum(S)}$ € vs. Angebot 2 $= ${mNum(R0)}$ €\nErgebnis: ${verdict}.`
     };
   }),
     ]},
@@ -805,11 +811,12 @@ const DATA = [
     const T = K0/n;
     const m = randInt(2,n-1);
     const restschuld = K0 - m*T;
+    const Z1 = round2(K0*p/100);
     return {
       f:`Kredit $K_0 = ${deInt(K0)}$ €, $p = ${p}\\%$, $n = ${n}$ Jahre, RATENTILGUNG (konstante Tilgung).\nWie hoch ist die jährliche Tilgungsrate? Wie hoch die Restschuld nach ${m} Jahren?`,
       h:"$T = K_0/n$, Zinsen jedes Jahr auf die Restschuld",
       l:`$T = ${mNum(T)}$ €/Jahr, Restschuld nach ${m} Jahren $= ${mNum(restschuld)}$ €`,
-      w:`$T = \\dfrac{${mInt(K0)}}{${n}} = ${mNum(T)}$ € pro Jahr\nRestschuld nach ${m} Jahren $= ${mInt(K0)} - ${m}\\cdot ${mNum(T)} = ${mNum(restschuld)}$ €`
+      w:`Formeln (Ratentilgung): $T = \\dfrac{K_0}{n}$ (konstant) und $K_m = K_0 - m\\cdot T$\n${SYM_TILG}\nBei Ratentilgung ist die TILGUNG jedes Jahr gleich; die Zinsen sinken, weil die Restschuld sinkt.\nSchritt 1 – Tilgungsrate: $T = \\dfrac{${mInt(K0)}}{${n}} = ${mNum(T)}$ € pro Jahr\nSchritt 2 – Restschuld: $K_{${m}} = ${mInt(K0)} - ${m}\\cdot ${mNum(T)}$\nErgebnis: $K_{${m}} = ${mNum(restschuld)}$ €\n(Zur Kontrolle: Zinsen im 1. Jahr $Z_1 = K_0\\cdot\\frac{p}{100} = ${mNum(Z1)}$ €)`
     };
   }),
       (function(){
@@ -822,7 +829,7 @@ const DATA = [
       f:`Ein Kredit über $K_0 = ${deInt(K0)}$ €, $p = ${p}\\%$, $n = ${n}$ Jahre wird mit ANNUITÄTENTILGUNG (konstante Annuität) getilgt.\nBerechne die konstante Annuität.`,
       h:"$A = K_0 \\cdot q^n \\cdot \\dfrac{q-1}{q^n-1}$",
       l:`$A = ${mNum(A)}$ € (jedes Jahr konstant)`,
-      w:`$q = ${mQ(p)}$\n$A = ${mInt(K0)} \\cdot ${mQ(p)}^{${n}} \\cdot \\dfrac{${mNum(p/100,2)}}{${mQ(p)}^{${n}} - 1}$\n$A = ${mNum(A)}$ €`
+      w:`Formel (Annuität): $A = K_0 \\cdot q^n \\cdot \\dfrac{q-1}{q^n-1}$\n${SYM_TILG}\nDie Annuität $A$ = Zinsen + Tilgung ist jedes Jahr GLEICH; der Zinsanteil sinkt, der Tilgungsanteil steigt.\nSchritt 1: $q = 1+\\frac{${p}}{100} = ${mQ(p)}$, $q^{${n}} = ${mNum(Math.pow(q,n),4)}$\nSchritt 2 – Einsetzen: $A = ${mInt(K0)} \\cdot ${mNum(Math.pow(q,n),4)} \\cdot \\dfrac{${mNum(p/100,2)}}{${mNum(Math.pow(q,n),4)} - 1}$\nErgebnis: $A = ${mNum(A)}$ € pro Jahr`
     };
   }),
       (function(){
@@ -838,7 +845,7 @@ const DATA = [
       f:`Ein Kredit über ${deInt(K0)} € soll in ${n} Jahren durch gleichbleibende Annuität bei $p=${p}\\%$ getilgt werden.\nWie hoch ist die Annuität und die Restschuld nach ${m} Jahren?`,
       h:"Erst Annuität, dann $T_1 = A - K_0\\cdot p/100$, dann Restschuld über die geometrische Reihe der Tilgungsraten.",
       l:`$A = ${mNum(A)}$ €, Restschuld nach ${m} Jahren $= ${mNum(Km)}$ €`,
-      w:`$A = ${mInt(K0)} \\cdot ${mQ(p)}^{${n}} \\cdot \\dfrac{${mNum(p/100,2)}}{${mQ(p)}^{${n}} - 1} = ${mNum(A)}$ €\n$T_1 = A - K_0\\cdot p/100 = ${mNum(A)} - ${mNum(K0*p/100)} = ${mNum(T1)}$ €\n$K_{${m}} = ${mInt(K0)} - ${mNum(T1)}\\cdot\\dfrac{${mQ(p)}^{${m}}-1}{${mNum(p/100,2)}}$\n$K_{${m}} = ${mNum(Km)}$ €`
+      w:`Formeln: $A = K_0 \\cdot q^n \\cdot \\dfrac{q-1}{q^n-1}$;  $T_1 = A - Z_1 = A - K_0\\cdot\\frac{p}{100}$;  $K_m = K_0 - T_1\\cdot\\dfrac{q^m-1}{q-1}$\n${SYM_TILG}, $T_1$ = Tilgungsanteil im 1. Jahr\nSchritt 1 – Annuität: $q = ${mQ(p)}$, $A = ${mInt(K0)} \\cdot ${mQ(p)}^{${n}} \\cdot \\dfrac{${mNum(p/100,2)}}{${mQ(p)}^{${n}} - 1} = ${mNum(A)}$ €\nSchritt 2 – Tilgung im 1. Jahr: $Z_1 = ${mInt(K0)}\\cdot ${mNum(p/100,2)} = ${mNum(K0*p/100)}$ €, also $T_1 = ${mNum(A)} - ${mNum(K0*p/100)} = ${mNum(T1)}$ €\nSchritt 3 – Restschuld (Summe der gewachsenen Tilgungsraten abziehen): $K_{${m}} = ${mInt(K0)} - ${mNum(T1)}\\cdot\\dfrac{${mQ(p)}^{${m}}-1}{${mNum(p/100,2)}}$\nErgebnis: $K_{${m}} = ${mNum(Km)}$ €`
     };
   }),
       (function(){
@@ -854,7 +861,7 @@ const DATA = [
       f:`Ein Kredit über ${deInt(K0)} € ($p=${p}\\%$, $n=${n}$ Jahre, Annuitätentilgung) hat eine Tilgungsrate im 1. Jahr von $T_1=${de(T1)}$ €.\nWie hoch ist die Tilgungsrate im ${m}. Jahr ($T_{${m}}$)?`,
       h:"$T_m = T_1 \\cdot q^{m-1}$",
       l:`$T_{${m}} = ${mNum(Tm)}$ €`,
-      w:`$T_{${m}} = ${mNum(T1)} \\cdot ${mQ(p)}^{${m-1}} = ${mNum(Tm)}$ €`
+      w:`Formel: $T_m = T_1 \\cdot q^{m-1}$\nDabei: $T_1$ = Tilgungsrate im 1. Jahr, $T_m$ = Tilgungsrate im Jahr $m$, $q = 1+\\frac{p}{100}$\nHintergrund: Bei Annuitätentilgung wächst die Tilgung jedes Jahr um den Faktor $q$ (geometrisch), weil die Annuität konstant bleibt und der Zinsanteil sinkt.\nSchritt 1: $q = ${mQ(p)}$, Exponent: $m-1 = ${m-1}$\nSchritt 2 – Einsetzen: $T_{${m}} = ${mNum(T1)} \\cdot ${mQ(p)}^{${m-1}}$\nErgebnis: $T_{${m}} = ${mNum(Tm)}$ €`
     };
   }),
       (function(){
@@ -871,7 +878,7 @@ const DATA = [
       f:`Vergleiche für einen Kredit über ${deInt(K0)} € ($p=${p}\\%$, $n=${n}$ Jahre): Bei welchem Verfahren ist die Belastung im 1. Jahr höher – Raten- oder Annuitätentilgung?`,
       h:"Vergleiche die Summe aus Zinsen+Tilgung im 1. Jahr für beide Verfahren.",
       l:`${verdict} hat im 1. Jahr die höhere Belastung (${de(belastungRate)} € vs. ${de(A)} €).`,
-      w:`Ratentilgung Jahr 1: $T=${mNum(T)} + $ Zinsen $${mNum(zinsRate)} = ${mNum(belastungRate)}$ € Gesamtbelastung\nAnnuitätentilgung Jahr 1: konstant $${mNum(A)}$ €\n$\\Rightarrow$ ${verdict} hat die höhere Belastung im 1. Jahr.`
+      w:`Prinzip: Jahresbelastung = Zinsen + Tilgung. Für beide Verfahren im 1. Jahr berechnen.\n${SYM_TILG}\nRatentilgung: $T = \\dfrac{K_0}{n} = \\dfrac{${mInt(K0)}}{${n}} = ${mNum(T)}$ €; Zinsen $Z_1 = K_0\\cdot\\frac{p}{100} = ${mNum(zinsRate)}$ €\n$\\Rightarrow$ Belastung Jahr 1 $= ${mNum(T)} + ${mNum(zinsRate)} = ${mNum(belastungRate)}$ €\nAnnuitätentilgung: $A = K_0 \\cdot q^n \\cdot \\dfrac{q-1}{q^n-1} = ${mNum(A)}$ € (konstant)\nVergleich: ${mNum(belastungRate)} € vs. ${mNum(A)} €\nErgebnis: ${verdict} hat die höhere Anfangsbelastung. (Ratentilgung startet höher, sinkt aber jedes Jahr.)`
     };
   }),
     ]},
@@ -900,7 +907,7 @@ const DATA = [
       f:`Haushalt A verbraucht ${deInt(x1)} kWh und zahlt ${de(y1)} €. Haushalt B verbraucht ${deInt(x2)} kWh und zahlt ${de(y2)} €.\nBestimme die lineare Kostenfunktion $f(x) = m\\cdot x + b$.`,
       h:"Steigung $m$ aus zwei Punkten, dann $b$ einsetzen.",
       l:`$f(x) = ${mNum(m,2)}x + ${deInt(b)}$`,
-      w:`$m = \\dfrac{${mNum(y2)}-${mNum(y1)}}{${mInt(x2)}-${mInt(x1)}} = ${mNum(m,2)}$ €/kWh\n$b = ${mNum(y1)} - ${mNum(m,2)}\\cdot ${mInt(x1)} = ${deInt(b)}$ €\n$f(x) = ${mNum(m,2)}x + ${deInt(b)}$`
+      w:`Formel (Steigung aus 2 Punkten): $m = \\dfrac{y_2-y_1}{x_2-x_1}$\nDabei: $m$ = Steigung (Preis pro kWh), $b$ = $y$-Achsenabschnitt (Grundpreis, unabhängig vom Verbrauch), $(x_1|y_1), (x_2|y_2)$ = die zwei gegebenen Punkte\nSchritt 1 – Steigung: $m = \\dfrac{${mNum(y2)}-${mNum(y1)}}{${mInt(x2)}-${mInt(x1)}} = \\dfrac{${mNum(y2-y1)}}{${mInt(x2-x1)}} = ${mNum(m,2)}$ €/kWh\nSchritt 2 – $b$ bestimmen (Punkt A in $y = mx+b$ einsetzen): $${mNum(y1)} = ${mNum(m,2)}\\cdot ${mInt(x1)} + b \\Rightarrow b = ${mNum(y1)} - ${mNum(m*x1)} = ${deInt(b)}$ €\nErgebnis: $f(x) = ${mNum(m,2)}x + ${deInt(b)}$`
     };
   }),
       (function(){
@@ -916,7 +923,7 @@ const DATA = [
       f:`Löse: $${eq}$`,
       h:`Mitternachtsformel mit $a=${a}$, $b=${b}$, $c=${c}$`,
       l:`$x_1 = ${xa}$,  $x_2 = ${xb}$`,
-      w:`$D = ${b}^2 - 4\\cdot ${a}\\cdot ${c} = ${D}$\n$x_{1,2} = \\dfrac{${-b} \\pm \\sqrt{${D}}}{${2*a}}$\n$x_1 = ${xa}$,  $x_2 = ${xb}$`
+      w:`Formel (Mitternachtsformel): $x_{1,2} = \\dfrac{-b\\pm\\sqrt{b^2-4ac}}{2a}$\nDabei: $a$ = Koeffizient vor $x^2$, $b$ = Koeffizient vor $x$, $c$ = Absolutglied; $D = b^2-4ac$ = Diskriminante (entscheidet über Lösungsanzahl)\nAblesen: $a=${a}$, $b=${b}$, $c=${c}$\nSchritt 1 – Diskriminante: $D = (${b})^2 - 4\\cdot ${a}\\cdot (${c}) = ${b*b} - (${4*a*c}) = ${D} > 0 \\Rightarrow$ 2 Lösungen\nSchritt 2 – Einsetzen: $x_{1,2} = \\dfrac{${-b} \\pm \\sqrt{${D}}}{${2*a}} = \\dfrac{${-b} \\pm ${Math.sqrt(D)%1===0?Math.sqrt(D):mNum(Math.sqrt(D))}}{${2*a}}$\nErgebnis: $x_1 = ${xa}$,  $x_2 = ${xb}$\n(Probe: beide Werte in die Gleichung einsetzen $\\Rightarrow$ 0)`
     };
   }),
       (function(){
@@ -928,7 +935,7 @@ const DATA = [
       f:`Löse: $${a===1?"":a}x^2 + ${b}x + ${c} = 0$. Wie viele Lösungen gibt es?`,
       h:"Diskriminante $D = b^2-4ac$ berechnen.",
       l:`Keine reelle Lösung ($D = ${D} < 0$).`,
-      w:`$D = ${b}^2 - 4\\cdot ${a}\\cdot ${c} = ${D} < 0$\n$\\Rightarrow$ keine reelle Lösung`
+      w:`Formel: $D = b^2-4ac$ (Diskriminante der Mitternachtsformel)\nDabei entscheidet $D$: $D>0 \\Rightarrow$ 2 Lösungen, $D=0 \\Rightarrow$ genau 1 Lösung, $D<0 \\Rightarrow$ KEINE reelle Lösung (Wurzel aus negativer Zahl)\nAblesen: $a=${a}$, $b=${b}$, $c=${c}$\nEinsetzen: $D = ${b}^2 - 4\\cdot ${a}\\cdot ${c} = ${b*b} - ${4*a*c} = ${D}$\nErgebnis: $D < 0 \\Rightarrow$ keine reelle Lösung. Diese Antwort in der Klausur explizit hinschreiben!`
     };
   }),
       (function(){
@@ -941,7 +948,7 @@ const DATA = [
       f:`$\\log_{${base}}(${value}) = \\,?$ Und: löse $${base}^x = ${target}$ nach $x$.`,
       h:"$\\log_a(y)$ ist die Hochzahl, mit der $a$ potenziert werden muss, um $y$ zu erhalten.",
       l:`$\\log_{${base}}(${value}) = ${k}$,  $x = ${k2}$`,
-      w:`$\\log_{${base}}(${value}) = ${k}$, denn $${base}^{${k}}=${value}$\n$${base}^x = ${target} = ${base}^{${k2}} \\Rightarrow x = ${k2}$`
+      w:`Definition: $\\log_a(y) = x \\Leftrightarrow a^x = y$\nDabei: $a$ = Basis, $y$ = Argument (Numerus), $x$ = gesuchte Hochzahl\nTeil 1: $\\log_{${base}}(${value}) = ${k}$, denn $${base}^{${k}} = ${value}$\nTeil 2: $${base}^x = ${target}$. Schreibe die rechte Seite als Potenz der Basis: $${target} = ${base}^{${k2}}$\n$\\Rightarrow ${base}^x = ${base}^{${k2}} \\Rightarrow x = ${k2}$ (Exponentenvergleich)\nAlternativ mit Logarithmus: $x = \\dfrac{\\log(${target})}{\\log(${base})} = ${k2}$`
     };
   }),
       (function(){
@@ -954,7 +961,7 @@ const DATA = [
       f:`Ein Kapital verändert sich um das ${factor}-fache bei $p=${p}\\%$ Zinseszins. Nach wie vielen Jahren (Logarithmusgesetz nutzen)?`,
       h:`$${factor} = q^n \\Rightarrow n = \\dfrac{\\log(${factor})}{\\log(q)}$`,
       l:`Nach ${nCeil} Jahren.`,
-      w:`$${factor} = ${mNum(q,2)}^n$\n$n = \\dfrac{\\log(${factor})}{\\log(${mNum(q,2)})} = ${mNum(nExact)}$\n$\\Rightarrow$ nach ${nCeil} Jahren`
+      w:`Ansatz: $K_n = ${factor}\\cdot K_0$ und $K_n = K_0\\cdot q^n$ $\\Rightarrow$ $${factor} = q^n$\nDabei: $q = 1+\\frac{p}{100}$ = Aufzinsungsfaktor, $n$ = gesuchte Jahre\nLogarithmusgesetz: $\\log(q^n) = n\\cdot\\log(q)$ — deshalb darf man den Exponenten „herunterziehen“.\nUmstellen: $n = \\dfrac{\\log(${factor})}{\\log(q)}$\nEinsetzen: $q = ${mNum(q,2)}$, also $n = \\dfrac{\\log(${factor})}{\\log(${mNum(q,2)})} = ${mNum(nExact)}$\nErgebnis: aufrunden $\\Rightarrow$ nach ${nCeil} Jahren.`
     };
   }),
     ]},
@@ -978,7 +985,7 @@ const DATA = [
       f:`Leite ab: $f(x) = ${f}$`,
       h:"Potenzregel: $x^n \\rightarrow n\\cdot x^{n-1}$",
       l:`$f'(x) = ${fp}$`,
-      w:`$f'(x) = ${fp}$`
+      w:`Regel (Potenzregel): $f(x) = a\\cdot x^n \\Rightarrow f'(x) = a\\cdot n\\cdot x^{n-1}$\nDabei: Exponent $n$ „nach vorne ziehen“ und um 1 verringern; konstante Summanden fallen weg ($f(x)=c \\Rightarrow f'(x)=0$).\nTermweise ableiten:\n$${a}x^4 \\rightarrow 4\\cdot ${a}\\cdot x^{3} = ${4*a}x^3$\n$${-b}x^2 \\rightarrow 2\\cdot(${-b})\\cdot x^{1} = ${-2*b}x$\n$${c}x \\rightarrow ${c}$ (Exponent 1, $x^0=1$)\n$${-d} \\rightarrow 0$ (Konstante)\nErgebnis: $f'(x) = ${fp}$`
     };
   }),
       (function(){
@@ -991,7 +998,7 @@ const DATA = [
       f:`$K(x) = ${Kx}$.\nBestimme Extrem- bzw. Wendepunkte bei $x=${r}$.`,
       h:"1. Ableitung $=0$ (notwendig), 2. Ableitung prüft Max/Min, 3. Ableitung prüft Wendepunkt.",
       l:`Kein Extremum, sondern Sattelpunkt bei $(${r}\\,/\\,${deInt(Kval)})$.`,
-      w:`$K'(x) = 3x^2${st(2*b,"x")}${st(c,"")} = 3(x-${r})^2 = 0 \\Rightarrow x=${r}$ (doppelte Lösung)\n$K''(x) = 6x${st(b,"")}$\n$K''(${r}) = 0 \\Rightarrow$ KEIN Extremum $\\Rightarrow$ Sattelpunkt (Terrassenpunkt)\n$K(${r}) = ${deInt(Kval)} \\Rightarrow$ Punkt $(${r}\\,/\\,${deInt(Kval)})$`
+      w:`Schema: Notwendige Bedingung $K'(x)=0$; hinreichend: $K''(x)<0 \\Rightarrow$ Maximum, $K''(x)>0 \\Rightarrow$ Minimum, $K''(x)=0 \\Rightarrow$ kein Extremum (Wendepunkt prüfen mit $K'''(x)\\neq 0$)\nSchritt 1 – Ableitungen bilden:\n$K'(x) = 3x^2${st(2*b,"x")}${st(c,"")}$\n$K''(x) = 6x${st(2*b,"")}$\n$K'''(x) = 6$\nSchritt 2 – $K'(x)=0$: $3x^2${st(2*b,"x")}${st(c,"")} = 3(x-${r})^2 = 0 \\Rightarrow x = ${r}$ (doppelte Nullstelle!)\nSchritt 3 – hinreichende Bedingung: $K''(${r}) = 6\\cdot ${r}${st(2*b,"")} = 0$ $\\Rightarrow$ KEIN Extremum\nSchritt 4 – Wendepunkt: $K'''(${r}) = 6 \\neq 0$ $\\Rightarrow$ Wendepunkt mit waagerechter Tangente = Sattelpunkt\nSchritt 5 – $y$-Wert: $K(${r}) = ${deInt(Kval)}$\nErgebnis: Sattelpunkt (Terrassenpunkt) bei $(${r}\\,/\\,${deInt(Kval)})$`
     };
   }),
       (function(){
@@ -1003,16 +1010,22 @@ const DATA = [
       f:`Bestimme alle Extremstellen von $f(x) = -x^3 + ${a}x^2$ inkl. Art (Max/Min).`,
       h:"$f'(x)=0$ notwendig, $f''(x)$ hinreichend: $<0$ Max, $>0$ Min",
       l:`Tiefpunkt $(0/0)$, Hochpunkt $(${x2}/${deInt(f(x2))})$`,
-      w:`$f'(x) = -3x^2+${2*a}x = x(-3x+${2*a}) = 0 \\Rightarrow x_1=0, x_2=${x2}$\n$f''(x) = -6x+${2*a}$\n$f''(0)=${2*a}>0 \\Rightarrow$ Minimum, $f(0)=0 \\Rightarrow$ Tiefpunkt $(0/0)$\n$f''(${x2})=${2*a-6*x2}<0 \\Rightarrow$ Maximum, $f(${x2})=${deInt(f(x2))} \\Rightarrow$ Hochpunkt $(${x2}/${deInt(f(x2))})$`
+      w:`Schema: 1) $f'(x)=0$ lösen (Kandidaten), 2) $f''$ an den Kandidaten prüfen, 3) $y$-Werte berechnen\nDabei: $f''(x_0)<0 \\Rightarrow$ Maximum (Rechtskrümmung), $f''(x_0)>0 \\Rightarrow$ Minimum (Linkskrümmung)\nSchritt 1 – Ableitungen: $f'(x) = -3x^2+${2*a}x$;  $f''(x) = -6x+${2*a}$\nSchritt 2 – $f'(x)=0$: $-3x^2+${2*a}x = x\\cdot(-3x+${2*a}) = 0$\n$\\Rightarrow x_1 = 0$ oder $-3x+${2*a}=0 \\Rightarrow x_2 = \\dfrac{${2*a}}{3} = ${x2}$\nSchritt 3 – Art prüfen:\n$f''(0) = ${2*a} > 0 \\Rightarrow$ Minimum; $f(0) = 0 \\Rightarrow$ Tiefpunkt $(0/0)$\n$f''(${x2}) = -6\\cdot ${x2}+${2*a} = ${2*a-6*x2} < 0 \\Rightarrow$ Maximum; $f(${x2}) = ${deInt(f(x2))} \\Rightarrow$ Hochpunkt $(${x2}/${deInt(f(x2))})$`
     };
   }),
       (function(){
-    const label = randChoice(["Nachfragefunktion $x(p)$","Angebotsfunktion $x(p)$","Kostenfunktion $K(x)$"]);
+    const a = randInt(2,6)*10;   // x(p) = a*10 - b p (Nachfrage)
+    const b = randInt(2,8);
+    const N = a*10;
+    // choose p0 so that x(p0) positive and numbers clean
+    const p0 = randInt(2, Math.floor((N-10)/b/2)>2?Math.floor((N-10)/b/2):3 );
+    const x0 = N - b*p0;
+    const e = round2((-b)*p0/x0);
     return {
-      f:`Die ${label} sei gegeben. Was misst die Elastizität und wie wird sie berechnet?`,
-      h:"Verhältnis von Grenzfunktion zu Durchschnittsfunktion.",
-      l:"$e = $ Grenzfunktion $/$ Durchschnittsfunktion",
-      w:`$e = \\dfrac{f'(x)\\cdot x}{f(x)} = $ Grenzfunktion $/$ Durchschnittsfunktion\nSie gibt die relative Änderung der Zielgröße bezogen auf die relative Änderung von $x$ an.`
+      f:`Nachfragefunktion $x(p) = ${N} - ${b}p$. Berechne die Preiselastizität der Nachfrage an der Stelle $p_0 = ${p0}$ und interpretiere kurz.`,
+      h:"$e = x'(p)\\cdot\\dfrac{p}{x(p)}$",
+      l:`$e = ${mNum(e)}$ (${Math.abs(e)>1?"elastisch":"unelastisch"})`,
+      w:`Formel (Punktelastizität): $e_{x,p} = x'(p)\\cdot\\dfrac{p}{x(p)}$\nDabei: $x(p)$ = Nachfragemenge beim Preis $p$, $x'(p)$ = 1. Ableitung (Grenzfunktion), $p_0$ = betrachteter Preis\nInterpretation: $|e|>1$ elastisch (Nachfrage reagiert stark), $|e|<1$ unelastisch, $|e|=1$ proportional-elastisch\nSchritt 1 – Ableitung: $x'(p) = -${b}$\nSchritt 2 – Menge an der Stelle: $x(${p0}) = ${N} - ${b}\\cdot ${p0} = ${x0}$\nSchritt 3 – Einsetzen: $e = -${b}\\cdot\\dfrac{${p0}}{${x0}}$\nErgebnis: $e = ${mNum(e)}$ $\\Rightarrow$ Nachfrage ist hier ${Math.abs(e)>1?"ELASTISCH ($|e|>1$): 1% Preiserhöhung senkt die Menge um mehr als 1%":"UNELASTISCH ($|e|<1$): 1% Preiserhöhung senkt die Menge um weniger als 1%"}.`
     };
   }),
       (function(){
@@ -1025,7 +1038,7 @@ const DATA = [
       f:`Führe eine vollständige Kurvendiskussion durch für $f(x) = x^3 - ${k}x^2$ (Nullstellen, Extrempunkte, Wendepunkt).`,
       h:"Erst $f(x)=0$ faktorisieren, dann $f'(x)=0$, dann $f''(x)=0$.",
       l:`Nullstellen $x=0$ (doppelt) und $x=${k}$; Hochpunkt $(0/0)$, Tiefpunkt $(${x2}/${deInt(f(x2))})$, Wendepunkt $(${xw}/${deInt(f(xw))})$.`,
-      w:`Nullstellen: $x^3-${k}x^2=0 \\Rightarrow x^2(x-${k})=0 \\Rightarrow x_1=0$ (doppelt), $x_2=${k}$\n$f'(x)=3x^2-${2*k}x=0 \\Rightarrow x(3x-${2*k})=0 \\Rightarrow x_1=0, x_2=${x2}$\n$f''(x)=6x-${2*k}$: $f''(0)=-${2*k}<0\\Rightarrow$Max $(0/0)$; $f''(${x2})=${6*x2-2*k}>0\\Rightarrow$Min $(${x2}/${deInt(f(x2))})$\nWendepunkt: $f''(x)=0 \\Rightarrow x=${xw}$, $f(${xw})=${deInt(f(xw))} \\Rightarrow W(${xw}/${deInt(f(xw))})$`
+      w:`Schema Kurvendiskussion: 1) Nullstellen $f(x)=0$, 2) Extrempunkte über $f'(x)=0$ + $f''$-Test, 3) Wendepunkte über $f''(x)=0$ + $f'''\\neq 0$\nAbleitungen: $f'(x)=3x^2-${2*k}x$;  $f''(x)=6x-${2*k}$;  $f'''(x)=6$\nSchritt 1 – Nullstellen: $x^3-${k}x^2 = x^2(x-${k})=0 \\Rightarrow x_1=0$ (doppelt, Berührpunkt), $x_2=${k}$\nSchritt 2 – Extrempunkte: $f'(x)= x(3x-${2*k})=0 \\Rightarrow x=0$ oder $x=${x2}$\n$f''(0)=-${2*k}<0 \\Rightarrow$ Hochpunkt $(0/0)$\n$f''(${x2})=6\\cdot ${x2}-${2*k}=${6*x2-2*k}>0 \\Rightarrow$ Tiefpunkt; $f(${x2})=${deInt(f(x2))} \\Rightarrow (${x2}/${deInt(f(x2))})$\nSchritt 3 – Wendepunkt: $f''(x)=0 \\Rightarrow 6x=${2*k} \\Rightarrow x=${xw}$; $f'''=6\\neq 0$ ✓\n$f(${xw})=${deInt(f(xw))} \\Rightarrow$ Wendepunkt $(${xw}/${deInt(f(xw))})$ (liegt genau zwischen Hoch- und Tiefpunkt)`
     };
   }),
       (function(){
@@ -1034,7 +1047,7 @@ const DATA = [
       f:`Leite ab: $f(x) = \\dfrac{${A}}{x^2} + ${B}\\sqrt{x}$   (Hinweis: als Potenzen schreiben)`,
       h:"$\\dfrac{4}{x^2} = 4x^{-2}$,  $3\\sqrt{x} = 3x^{1/2}$",
       l:`$f'(x) = -\\dfrac{${2*A}}{x^3} + \\dfrac{${mNum(B/2,1)}}{\\sqrt{x}}$`,
-      w:`$f(x) = ${A}x^{-2} + ${B}x^{1/2}$\n$f'(x) = -${2*A}x^{-3} + ${mNum(B/2,1)}x^{-1/2} = -\\dfrac{${2*A}}{x^3} + \\dfrac{${mNum(B/2,1)}}{\\sqrt{x}}$`
+      w:`Vorbereitung – Umschreiben in Potenzschreibweise:\n$\\dfrac{1}{x^n} = x^{-n}$ und $\\sqrt{x} = x^{1/2}$\n$\\Rightarrow f(x) = ${A}x^{-2} + ${B}x^{1/2}$\nRegel (Potenzregel, gilt auch für negative und gebrochene Exponenten): $x^n \\rightarrow n\\cdot x^{n-1}$\nTermweise:\n$${A}x^{-2} \\rightarrow (-2)\\cdot ${A}\\cdot x^{-3} = -${2*A}x^{-3}$\n$${B}x^{1/2} \\rightarrow \\dfrac{1}{2}\\cdot ${B}\\cdot x^{-1/2} = ${mNum(B/2,1)}x^{-1/2}$\nZurück umschreiben: $x^{-3} = \\dfrac{1}{x^3}$, $x^{-1/2} = \\dfrac{1}{\\sqrt{x}}$\nErgebnis: $f'(x) = -\\dfrac{${2*A}}{x^3} + \\dfrac{${mNum(B/2,1)}}{\\sqrt{x}}$`
     };
   }),
     ]},
@@ -1054,7 +1067,7 @@ const DATA = [
       f:`$f(x_1,x_2) = ${a}x_1^2 + ${b}x_1x_2 + ${c}x_2^2$. Bestimme alle ersten und zweiten partiellen Ableitungen.`,
       h:"Beim Ableiten nach $x_1$ wird $x_2$ als Konstante behandelt (und umgekehrt).",
       l:`$f'_{x_1}=${2*a}x_1+${b}x_2$,  $f'_{x_2}=${b}x_1+${2*c}x_2$,  $f''_{x_1x_1}=${2*a}$, $f''_{x_2x_2}=${2*c}$, $f''_{x_1x_2}=${b}$`,
-      w:`$f'_{x_1} = ${2*a}x_1 + ${b}x_2$\n$f'_{x_2} = ${b}x_1 + ${2*c}x_2$\n$f''_{x_1x_1} = ${2*a}$,  $f''_{x_2x_2} = ${2*c}$,  $f''_{x_1x_2} = f''_{x_2x_1} = ${b}$`
+      w:`Regel (partielle Ableitung): Nach $x_1$ ableiten $\\Rightarrow$ $x_2$ wie eine feste Zahl behandeln (und umgekehrt).\n${SYM_MV}\nSchritt 1 – erste Ableitung nach $x_1$ (Term $${c}x_2^2$ ist bzgl. $x_1$ konstant, fällt weg):\n$f'_{x_1} = ${2*a}x_1 + ${b}x_2$\nSchritt 2 – erste Ableitung nach $x_2$ (Term $${a}x_1^2$ fällt weg):\n$f'_{x_2} = ${b}x_1 + ${2*c}x_2$\nSchritt 3 – zweite Ableitungen:\n$f''_{x_1x_1} = ${2*a}$ (nochmal nach $x_1$),  $f''_{x_2x_2} = ${2*c}$ (nochmal nach $x_2$)\n$f''_{x_1x_2} = f''_{x_2x_1} = ${b}$ (gemischt – Satz von Schwarz: Reihenfolge egal)`
     };
   }),
       (function(){
@@ -1072,7 +1085,7 @@ const DATA = [
       f:`$G(x_1,x_2) = -${A}x_1^2 -${B}x_2^2 -${Cc}x_1x_2 +${d}x_1 +${e}x_2 -3000$.\nBestimme die Extremstelle (notwendige Bedingung) und prüfe, ob es ein Maximum ist.`,
       h:"Beide erste Ableitungen $=0$ als LGS lösen; hinreichend: $f''_{x_1x_1}\\cdot f''_{x_2x_2}-(f''_{x_1x_2})^2 > 0$ UND $f''_{x_1x_1}<0$",
       l:`Maximum bei $x_1\\approx ${Math.round(x1)}$, $x_2\\approx ${Math.round(x2)}$ (hinreichendes Kriterium bestätigt).`,
-      w:`$G'_{x_1} = -${2*A}x_1-${Cc}x_2+${d} = 0$\n$G'_{x_2} = -${Cc}x_1-${2*B}x_2+${e} = 0$\n$\\Rightarrow$ LGS lösen: $x_1 \\approx ${Math.round(x1)}$, $x_2 \\approx ${Math.round(x2)}$\n$G''_{x_1x_1}=-${2*A}$, $G''_{x_2x_2}=-${2*B}$, $G''_{x_1x_2}=-${Cc}$\n$(-${2*A})\\cdot(-${2*B})-(-${Cc})^2 = ${4*A*B-Cc*Cc} > 0$ und $G''_{x_1x_1}<0$\n$\\Rightarrow$ Maximum bestätigt`
+      w:`Schema Extremum bei 2 Variablen: 1) notwendig – beide ersten Ableitungen $=0$ (ergibt LGS), 2) hinreichend – Determinantenkriterium.\n${SYM_MV}\nSchritt 1 – erste Ableitungen $=0$:\n$G'_{x_1} = -${2*A}x_1-${Cc}x_2+${d} = 0$\n$G'_{x_2} = -${Cc}x_1-${2*B}x_2+${e} = 0$\nSchritt 2 – LGS lösen (siehe Kap. 4.1): $x_1 \\approx ${Math.round(x1)}$, $x_2 \\approx ${Math.round(x2)}$\nSchritt 3 – zweite Ableitungen: $G''_{x_1x_1}=-${2*A}$, $G''_{x_2x_2}=-${2*B}$, $G''_{x_1x_2}=-${Cc}$\nSchritt 4 – hinreichende Bedingung: $G''_{x_1x_1}\\cdot G''_{x_2x_2}-(G''_{x_1x_2})^2 = (-${2*A})\\cdot(-${2*B})-(-${Cc})^2 = ${4*A*B-Cc*Cc} > 0$\nund $G''_{x_1x_1}=-${2*A}<0$ $\\Rightarrow$ MAXIMUM bestätigt`
     };
   }),
       (function(){
@@ -1080,7 +1093,7 @@ const DATA = [
       f:"Was ist die notwendige Bedingung für ein Extremum bei einer Funktion mit zwei unabhängigen Variablen — anschaulich beschrieben?",
       h:"Denke an die Tangentialebene.",
       l:"$f'_{x_1} = 0$ und $f'_{x_2} = 0$ (waagerechte Tangentialebene).",
-      w:"Alle ersten partiellen Ableitungen müssen null sein:\n$f'_{x_1} = 0$  und  $f'_{x_2} = 0$\nAnschaulich: die Tangentialebene an der Stelle liegt waagerecht."
+      w:`Notwendige Bedingung: ALLE ersten partiellen Ableitungen müssen null sein:\n$f'_{x_1} = 0$  UND  $f'_{x_2} = 0$\nDabei: $f'_{x_1}$ = Steigung in $x_1$-Richtung, $f'_{x_2}$ = Steigung in $x_2$-Richtung\nAnschaulich: An einem Hoch-/Tiefpunkt ist die Tangentialebene an die Fläche komplett WAAGERECHT — es geht in keiner Richtung bergauf oder bergab.\nAchtung: notwendig heißt nicht hinreichend — es könnte auch ein Sattelpunkt sein (mit Determinantenkriterium prüfen).`
     };
   }),
       (function(){
@@ -1089,7 +1102,7 @@ const DATA = [
       f:`$f(x_1,x_2)=${a===1?"":a}x_1^2 + ${a===1?"":a}x_2^2 - ${2*a}x_1x_2$. Bestimme die kritische Stelle und prüfe mit dem hinreichenden Kriterium, ob ein Extremum vorliegt.`,
       h:"Achtung: das Kriterium kann auch 0 ergeben (keine eindeutige Aussage).",
       l:"Kritische Stelle bei $x_1=x_2$ (z.B. $(0,0)$); Kriterium ergibt $0$ → keine eindeutige Aussage möglich.",
-      w:`$f'_{x_1}=${2*a}x_1-${2*a}x_2=0$ ; $f'_{x_2}=${2*a}x_2-${2*a}x_1=0 \\Rightarrow x_1=x_2$ (kritische Gerade, z.B. $(0,0)$)\n$f''_{x_1x_1}=${2*a}$, $f''_{x_2x_2}=${2*a}$, $f''_{x_1x_2}=-${2*a}$\n$${2*a}\\cdot ${2*a}-(${2*a})^2 = 0 \\Rightarrow$ Kriterium unentscheidbar`
+      w:`Schema: notwendige Bedingung, dann Determinantenkriterium $D = f''_{x_1x_1}\\cdot f''_{x_2x_2}-(f''_{x_1x_2})^2$.\n${SYM_MV}\nSchritt 1 – erste Ableitungen $=0$:\n$f'_{x_1}=${2*a}x_1-${2*a}x_2=0$ und $f'_{x_2}=${2*a}x_2-${2*a}x_1=0 \\Rightarrow x_1=x_2$ (z.B. Punkt $(0,0)$)\nSchritt 2 – zweite Ableitungen: $f''_{x_1x_1}=${2*a}$, $f''_{x_2x_2}=${2*a}$, $f''_{x_1x_2}=-${2*a}$\nSchritt 3 – Kriterium: $D = ${2*a}\\cdot ${2*a}-(-${2*a})^2 = ${4*a*a}-${4*a*a} = 0$\nErgebnis: $D = 0 \\Rightarrow$ das Kriterium ist UNENTSCHEIDBAR (keine eindeutige Aussage über Extremum/Sattelpunkt möglich).`
     };
   }),
       (function(){
@@ -1098,7 +1111,7 @@ const DATA = [
       f:`Für $f(x_1,x_2)=-${a}x_1^2-${b}x_2^2+${2*a*p}x_1+${2*b*q}x_2$ bestimme die Extremstelle und ihre Art.`,
       h:"Erst notwendige Bedingung, dann Determinantenkriterium.",
       l:`Maximum bei $(${p}/${q})$.`,
-      w:`$f'_{x_1}=-${2*a}x_1+${2*a*p}=0 \\Rightarrow x_1=${p}$\n$f'_{x_2}=-${2*b}x_2+${2*b*q}=0 \\Rightarrow x_2=${q}$\n$f''_{x_1x_1}=-${2*a}$, $f''_{x_2x_2}=-${2*b}$, $f''_{x_1x_2}=0$\n$(-${2*a})(-${2*b})-0 = ${4*a*b}>0$ und $f''_{x_1x_1}<0 \\Rightarrow$ Maximum bei $(${p}/${q})$`
+      w:`Schema: notwendige Bedingung (beide ersten Ableitungen $=0$), dann hinreichend (Determinantenkriterium).\n${SYM_MV}\nSchritt 1 – erste Ableitungen $=0$:\n$f'_{x_1}=-${2*a}x_1+${2*a*p}=0 \\Rightarrow x_1=${p}$\n$f'_{x_2}=-${2*b}x_2+${2*b*q}=0 \\Rightarrow x_2=${q}$\nSchritt 2 – zweite Ableitungen: $f''_{x_1x_1}=-${2*a}$, $f''_{x_2x_2}=-${2*b}$, $f''_{x_1x_2}=0$\nSchritt 3 – Kriterium: $D = (-${2*a})(-${2*b})-0^2 = ${4*a*b}>0$ und $f''_{x_1x_1}=-${2*a}<0$\nErgebnis: MAXIMUM bei $(${p}/${q})$`
     };
   }),
     ]},
@@ -1119,7 +1132,7 @@ const DATA = [
       f:`Bestimme die Stammfunktion $F(x)$ von $f(x) = ${a}x^2 + ${b}x ${c>=0?'+ '+c:'- '+Math.abs(c)}$`,
       h:"Potenzregel rückwärts: $x^n \\rightarrow \\dfrac{x^{n+1}}{n+1}$",
       l:`$F(x) = ${mNum(a/3,2)}x^3 + ${mNum(b/2,2)}x^2 + ${c}x + C$`,
-      w:`$F(x) = \\dfrac{${a}}{3}x^3 + \\dfrac{${b}}{2}x^2 + ${c}x + C = ${mNum(a/3,2)}x^3 + ${mNum(b/2,2)}x^2 + ${c}x + C$`
+      w:`Regel (Integration, Potenzregel rückwärts): $\\displaystyle\\int x^n\\,dx = \\dfrac{x^{n+1}}{n+1}+C$\n${SYM_INT}\nIdee: Exponent um 1 ERHÖHEN und durch den neuen Exponenten teilen (Umkehrung des Ableitens).\nTermweise:\n$${a}x^2 \\rightarrow \\dfrac{${a}}{3}x^3 = ${mNum(a/3,2)}x^3$\n$${b}x \\rightarrow \\dfrac{${b}}{2}x^2 = ${mNum(b/2,2)}x^2$\n$${c} \\rightarrow ${c}x$ (Konstante wird zu $c\\cdot x$)\nNicht vergessen: $+C$\nErgebnis: $F(x) = ${mNum(a/3,2)}x^3 + ${mNum(b/2,2)}x^2 + ${c}x + C$\n(Kontrolle: $F'(x)$ ableiten muss wieder $f(x)$ ergeben.)`
     };
   }),
       (function(){
@@ -1131,7 +1144,7 @@ const DATA = [
       f:`Berechne das bestimmte Integral $\\displaystyle\\int_0^{${N}} (${a}x^2 + ${b}x ${c>=0?'+ '+c:'- '+Math.abs(c)})\\,dx$`,
       h:"$F(b) - F(a)$ einsetzen ($C$ fällt weg).",
       l:`Integral $= ${mNum(val)}$`,
-      w:`$F(x) = ${mNum(a/3,2)}x^3 + ${mNum(b/2,2)}x^2 + ${c}x$\n$F(${N}) = ${mNum(F(N))}$\n$F(0) = 0$\nIntegral $= ${mNum(val)}$`
+      w:`Formel (bestimmtes Integral): $\\displaystyle\\int_a^b f(x)\\,dx = F(b)-F(a)$\n${SYM_INT}; $a,b$ = untere/obere Grenze. Das $C$ fällt bei der Subtraktion immer weg.\nSchritt 1 – Stammfunktion: $F(x) = ${mNum(a/3,2)}x^3 + ${mNum(b/2,2)}x^2 + ${c}x$\nSchritt 2 – obere Grenze einsetzen: $F(${N}) = ${mNum(a/3,2)}\\cdot ${N}^3 + ${mNum(b/2,2)}\\cdot ${N}^2 + ${c}\\cdot ${N} = ${mNum(F(N))}$\nSchritt 3 – untere Grenze einsetzen: $F(0) = 0$\nSchritt 4 – subtrahieren: $${mNum(F(N))} - 0$\nErgebnis: Integral $= ${mNum(val)}$`
     };
   }),
       (function(){
@@ -1141,7 +1154,7 @@ const DATA = [
       f:`Die Grenzkostenfunktion ist $K'(x) = ${a}x^2 - ${b}x + ${c}$, die Fixkosten betragen ${deInt(fix)} €.\nBestimme die Gesamtkostenfunktion $K(x)$.`,
       h:"Integrieren, dann die Konstante $C$ über $K(0)=$ Fixkosten bestimmen.",
       l:`$K(x) = ${mNum(a/3,2)}x^3 - ${mNum(b/2,2)}x^2 + ${c}x + ${deInt(fix)}$`,
-      w:`$K(x) = ${mNum(a/3,2)}x^3 - ${mNum(b/2,2)}x^2 + ${c}x + C$\n$K(0) = C = ${deInt(fix)}$ (Fixkosten)\n$K(x) = ${mNum(a/3,2)}x^3 - ${mNum(b/2,2)}x^2 + ${c}x + ${deInt(fix)}$`
+      w:`Zusammenhang: Die Gesamtkosten $K(x)$ sind die Stammfunktion der Grenzkosten $K'(x)$, also $K(x) = \\int K'(x)\\,dx$.\n${SYM_INT}; hier ist $C$ = Fixkosten (Kosten bei $x=0$)\nSchritt 1 – integrieren: $K(x) = \\dfrac{${a}}{3}x^3 - \\dfrac{${b}}{2}x^2 + ${c}x + C = ${mNum(a/3,2)}x^3 - ${mNum(b/2,2)}x^2 + ${c}x + C$\nSchritt 2 – $C$ bestimmen: bei $x=0$ entstehen nur Fixkosten $\\Rightarrow K(0) = C = ${deInt(fix)}$\nErgebnis: $K(x) = ${mNum(a/3,2)}x^3 - ${mNum(b/2,2)}x^2 + ${c}x + ${deInt(fix)}$`
     };
   }),
       (function(){
@@ -1153,7 +1166,7 @@ const DATA = [
       f:`Bestimme die Stammfunktion von $f(x) = \\dfrac{${A}}{x^{${k}}} + ${B}x^{${m}}$`,
       h:"Potenzregel anwenden, auch bei negativen Exponenten.",
       l:`$F(x) = ${mNum(coefA,2)}\\cdot x^{${newExpA}} + ${mNum(coefB,2)}x^{${m+1}} + C$`,
-      w:`$f(x) = ${A}x^{-${k}} + ${B}x^{${m}}$\n$F(x) = \\dfrac{${A}}{${newExpA}}\\cdot x^{${newExpA}} + \\dfrac{${B}}{${m+1}}\\cdot x^{${m+1}} + C$\n$F(x) = ${mNum(coefA,2)}x^{${newExpA}} + ${mNum(coefB,2)}x^{${m+1}} + C$`
+      w:`Vorbereitung – Bruch in Potenz umschreiben: $\\dfrac{${A}}{x^{${k}}} = ${A}x^{-${k}}$\nRegel: $\\displaystyle\\int x^n\\,dx = \\dfrac{x^{n+1}}{n+1}+C$ (gilt auch für negative Exponenten, außer $n=-1$)\n${SYM_INT}\nTerm 1: $${A}x^{-${k}} \\rightarrow \\dfrac{${A}}{-${k}+1}x^{-${k}+1} = \\dfrac{${A}}{${newExpA}}x^{${newExpA}} = ${mNum(coefA,2)}x^{${newExpA}}$\nTerm 2: $${B}x^{${m}} \\rightarrow \\dfrac{${B}}{${m+1}}x^{${m+1}} = ${mNum(coefB,2)}x^{${m+1}}$\nErgebnis: $F(x) = ${mNum(coefA,2)}x^{${newExpA}} + ${mNum(coefB,2)}x^{${m+1}} + C$`
     };
   }),
       (function(){
@@ -1165,7 +1178,7 @@ const DATA = [
       f:`Berechne $\\displaystyle\\int_{${M}}^{${N}} (${a}x ${b>=0?'+ '+b:'- '+Math.abs(b)})\\,dx$`,
       h:"Erst Stammfunktion, dann $F(N)-F(M)$.",
       l:`Integral $= ${mNum(val)}$`,
-      w:`$F(x) = ${mNum(a/2,2)}x^2 + ${b}x$\n$F(${N}) = ${mNum(F(N))}$\n$F(${M}) = ${mNum(F(M))}$\nIntegral $= ${mNum(val)}$`
+      w:`Formel (bestimmtes Integral): $\\displaystyle\\int_a^b f(x)\\,dx = F(b)-F(a)$\n${SYM_INT}; $a=${M}$ untere, $b=${N}$ obere Grenze\nSchritt 1 – Stammfunktion: $F(x) = \\dfrac{${a}}{2}x^2 + ${b}x = ${mNum(a/2,2)}x^2 + ${b}x$\nSchritt 2 – obere Grenze: $F(${N}) = ${mNum(a/2,2)}\\cdot ${N}^2 + ${b}\\cdot ${N} = ${mNum(F(N))}$\nSchritt 3 – untere Grenze: $F(${M}) = ${mNum(a/2,2)}\\cdot ${M}^2 + ${b}\\cdot ${M} = ${mNum(F(M))}$\nSchritt 4 – subtrahieren: $${mNum(F(N))} - (${mNum(F(M))})$\nErgebnis: Integral $= ${mNum(val)}$`
     };
   }),
     ]},
@@ -1195,7 +1208,7 @@ const DATA = [
       f:`Löse mit dem Additionsverfahren:\n$\\text{(I)}\\ ${coefStr(a1)}x + ${coefStr(b1)}y = ${c1}$\n$\\text{(II)}\\ ${coefStr(a2)}x + ${coefStr(b2)}y = ${c2}$`,
       h:"So multiplizieren, dass sich beim Addieren eine Variable aufhebt.",
       l:`$S(${x0}\\,/\\,${y0})$`,
-      w:`$\\text{(I)}\\cdot${b2}:\\ ${a1*b2}x + ${b1*b2}y = ${c1*b2}$\n$\\text{(II)}\\cdot${b1}:\\ ${a2*b1}x + ${b1*b2}y = ${c2*b1}$\nSubtrahieren: $${a1*b2-a2*b1}x = ${c1*b2-c2*b1} \\Rightarrow x=${x0}$\nEinsetzen in (I): $y = ${y0}$\nLösung: $S(${x0}\\,/\\,${y0})$`
+      w:`Prinzip (Additionsverfahren): Beide Gleichungen so mit Faktoren multiplizieren, dass die Koeffizienten EINER Variable entgegengesetzt gleich werden — beim Addieren fällt sie dann weg.\nZiel hier: $y$ eliminieren $\\Rightarrow$ (I) mit $${b2}$, (II) mit $${b1}$ multiplizieren.\nSchritt 1: $\\text{(I)}\\cdot${b2}:\\ ${a1*b2}x + ${b1*b2}y = ${c1*b2}$\nSchritt 2: $\\text{(II)}\\cdot${b1}:\\ ${a2*b1}x + ${b1*b2}y = ${c2*b1}$\nSchritt 3 – subtrahieren (I)-(II): $(${a1*b2}-${a2*b1})x = ${c1*b2}-${c2*b1} \\Rightarrow ${a1*b2-a2*b1}x = ${c1*b2-c2*b1} \\Rightarrow x=${x0}$\nSchritt 4 – $x$ in (I) einsetzen: $${a1}\\cdot${x0}+${b1}y=${c1} \\Rightarrow y=${y0}$\nErgebnis: $S(${x0}\\,/\\,${y0})$`
     };
   }),
       (function gauss3(){
@@ -1217,7 +1230,7 @@ const DATA = [
       f:`Löse mit dem Gauß-Algorithmus:\n$\\text{(I)}\\ ${M[0][0]}x+${M[0][1]}y+${M[0][2]}z=${rhs[0]}$\n$\\text{(II)}\\ ${M[1][0]}x+${M[1][1]}y+${M[1][2]}z=${rhs[1]}$\n$\\text{(III)}\\ ${M[2][0]}x+${M[2][1]}y+${M[2][2]}z=${rhs[2]}$`,
       h:"Eliminiere $x$ aus (II) und (III) mit Vielfachen von (I), dann $y$ eliminieren.",
       l:`$x=${x0}$, $y=${y0}$, $z=${z0}$`,
-      w:`Nach Gauß-Elimination ergibt sich:\n$x = ${x0}$\n$y = ${y0}$\n$z = ${z0}$\n(Probe: alle drei Gleichungen erfüllt)`
+      w:`Prinzip (Gauß-Algorithmus): Durch Zeilenumformungen eine Dreiecksform erzeugen, dann von unten nach oben einsetzen.\nErlaubte Umformungen: Zeilen vertauschen, mit Faktor $\\neq 0$ multiplizieren, Vielfaches einer Zeile zu einer anderen addieren.\nSchritt 1: $x$ aus (II) und (III) eliminieren, indem passende Vielfache von (I) subtrahiert werden.\nSchritt 2: aus den zwei neuen Gleichungen $y$ eliminieren $\\Rightarrow$ eine Gleichung nur noch mit $z$.\nSchritt 3 – rückwärts einsetzen (von unten):\n$z = ${z0}$\n$y = ${y0}$ (mit bekanntem $z$ in die 2. Zeile)\n$x = ${x0}$ (mit $y,z$ in Zeile (I))\nErgebnis: $x=${x0}$, $y=${y0}$, $z=${z0}$ (Probe: alle drei Ausgangsgleichungen erfüllt)`
     };
   }),
       (function einsetzung(){
@@ -1233,7 +1246,7 @@ const DATA = [
       f:`Löse mit dem Einsetzungsverfahren:\n$\\text{(I)}\\ ${coefStr(a1)}x + ${coefStr(b1)}y = ${c1}$\n$\\text{(II)}\\ ${coefStr(a2)}x + ${coefStr(b2)}y = ${c2}$`,
       h:"(I) nach $y$ auflösen (oder nach $x$), in (II) einsetzen.",
       l:`$S(${x0}\\,/\\,${y0})$`,
-      w:`aus (I): $y = \\dfrac{${c1} - ${a1}x}{${b1}}$\nin (II) einsetzen und nach $x$ auflösen: $x=${x0}$\n$y = ${y0}$\nLösung: $S(${x0}\\,/\\,${y0})$`
+      w:`Prinzip (Einsetzungsverfahren): Eine Gleichung nach einer Variable auflösen und diesen Ausdruck in die andere Gleichung EINSETZEN.\nSchritt 1 – (I) nach $y$ auflösen: $${coefStr(b1)}y = ${c1} - ${coefStr(a1)}x \\Rightarrow y = \\dfrac{${c1} - ${a1}x}{${b1}}$\nSchritt 2 – in (II) einsetzen: $${a2}x + ${b2}\\cdot\\dfrac{${c1}-${a1}x}{${b1}} = ${c2}$\nSchritt 3 – nach $x$ auflösen: $x = ${x0}$\nSchritt 4 – $x$ zurück in die aufgelöste Gleichung: $y = ${y0}$\nErgebnis: $S(${x0}\\,/\\,${y0})$`
     };
   }),
       (function gleichsetzung(){
@@ -1249,7 +1262,7 @@ const DATA = [
       f:`Löse mit dem Gleichsetzungsverfahren:\n$\\text{(I)}\\ ${coefStr(a1)}x + ${coefStr(b1)}y = ${c1}$\n$\\text{(II)}\\ ${coefStr(a2)}x + ${coefStr(b2)}y = ${c2}$`,
       h:"Beide Gleichungen nach derselben Variable auflösen, dann gleichsetzen.",
       l:`$S(${x0}\\,/\\,${y0})$`,
-      w:`aus (I): $y = \\dfrac{${c1}-${a1}x}{${b1}}$\naus (II): $y = \\dfrac{${c2}-${a2}x}{${b2}}$\nGleichsetzen und nach $x$ auflösen: $x=${x0}$\n$y = ${y0}$\nLösung: $S(${x0}\\,/\\,${y0})$`
+      w:`Prinzip (Gleichsetzungsverfahren): BEIDE Gleichungen nach DERSELBEN Variable auflösen und die beiden Ausdrücke gleichsetzen.\nSchritt 1 – (I) nach $y$: $y = \\dfrac{${c1}-${a1}x}{${b1}}$\nSchritt 2 – (II) nach $y$: $y = \\dfrac{${c2}-${a2}x}{${b2}}$\nSchritt 3 – gleichsetzen: $\\dfrac{${c1}-${a1}x}{${b1}} = \\dfrac{${c2}-${a2}x}{${b2}}$\nSchritt 4 – nach $x$ auflösen: $x = ${x0}$\nSchritt 5 – $x$ einsetzen: $y = ${y0}$\nErgebnis: $S(${x0}\\,/\\,${y0})$`
     };
   }),
       (function additionsverfahren2(){
@@ -1265,7 +1278,7 @@ const DATA = [
       f:`Löse mit dem Additionsverfahren:\n$\\text{(I)}\\ ${coefStr(a1)}x + ${coefStr(b1)}y = ${c1}$\n$\\text{(II)}\\ ${coefStr(a2)}x - ${coefStr(b2)}y = ${c2}$`,
       h:"Gleichungen so multiplizieren, dass sich beim Addieren eine Variable aufhebt.",
       l:`$S(${x0}\\,/\\,${y0})$`,
-      w:`$\\text{(I)}\\cdot${b2} + \\text{(II)}\\cdot${b1}:\\ ${a1*b2+a2*b1}x = ${c1*b2+c2*b1} \\Rightarrow x=${x0}$\nEinsetzen in (I): $y = ${y0}$\nLösung: $S(${x0}\\,/\\,${y0})$`
+      w:`Prinzip (Additionsverfahren): So multiplizieren, dass sich beim ADDIEREN eine Variable aufhebt.\nZiel: $y$ eliminieren. (I) hat $+${b1}y$, (II) hat $-${b2}y$ $\\Rightarrow$ (I) mit $${b2}$, (II) mit $${b1}$ multiplizieren, dann addieren.\nSchritt 1: $\\text{(I)}\\cdot${b2}:\\ ${a1*b2}x + ${b1*b2}y = ${c1*b2}$\nSchritt 2: $\\text{(II)}\\cdot${b1}:\\ ${a2*b1}x - ${b1*b2}y = ${c2*b1}$\nSchritt 3 – addieren: $(${a1*b2}+${a2*b1})x = ${c1*b2}+${c2*b1} \\Rightarrow ${a1*b2+a2*b1}x = ${c1*b2+c2*b1} \\Rightarrow x=${x0}$\nSchritt 4 – in (I) einsetzen: $y = ${y0}$\nErgebnis: $S(${x0}\\,/\\,${y0})$`
     };
   }),
     ]},
@@ -1292,7 +1305,7 @@ const DATA = [
       f:`$A$ ist eine $${o.a[0]}\\times ${o.a[1]}$-Matrix, $B$ eine $${o.b[0]}\\times ${o.b[1]}$-Matrix. Ist $A\\cdot B$ möglich? Welche Größe hat das Ergebnis?`,
       h:"Spaltenzahl von $A$ muss Zeilenzahl von $B$ entsprechen.",
       l:`Ja, möglich; Ergebnis ist eine $${o.a[0]}\\times ${o.b[1]}$-Matrix.`,
-      w:`Spalten$(A)=${o.a[1]} = $ Zeilen$(B)=${o.b[0]}$ → Multiplikation möglich.\nErgebnis $A\\cdot B$ ist eine $${o.a[0]}\\times ${o.b[1]}$-Matrix.`
+      w:`Regel (Matrixmultiplikation möglich?): Bei $A\\cdot B$ muss die SPALTENZAHL von $A$ = ZEILENZAHL von $B$ sein. Das Ergebnis hat dann (Zeilen von $A$) $\\times$ (Spalten von $B$).\nMerkhilfe: $(m\\times \\underline{n})\\cdot(\\underline{n}\\times p) = (m\\times p)$ — die inneren Zahlen müssen gleich sein, die äußeren bilden das Ergebnis.\nHier: $A$ ist $${o.a[0]}\\times \\underline{${o.a[1]}}$, $B$ ist $\\underline{${o.b[0]}}\\times ${o.b[1]}$\nInnere Zahlen: $${o.a[1]}$ und $${o.b[0]}$ ${o.a[1]===o.b[0]?"stimmen überein ✓":"stimmen NICHT überein ✗"}\nErgebnis: eine $${o.a[0]}\\times ${o.b[1]}$-Matrix.`
     };
   }),
       (function(){
@@ -1305,7 +1318,7 @@ const DATA = [
       f:`Gegeben $A=${A}$. Bestimme $A^T$ (Transponierte) und berechne $A\\cdot A^T$.`,
       h:"Transponieren = Zeilen/Spalten tauschen, dann normal multiplizieren (Zeile mal Spalte).",
       l:`$A^T = ${AT}$;  $A\\cdot A^T = ${R}$`,
-      w:`$A^T = ${AT}$\n$A\\cdot A^T = \\begin{bmatrix}${a}\\cdot ${a}+${b}\\cdot ${b} & ${a}\\cdot ${c}+${b}\\cdot ${d} \\\\ ${c}\\cdot ${a}+${d}\\cdot ${b} & ${c}\\cdot ${c}+${d}\\cdot ${d}\\end{bmatrix}$\n$= ${R}$\n→ $A\\cdot A^T$ ist immer symmetrisch.`
+      w:`Begriffe: $A^T$ (Transponierte) = Zeilen und Spalten vertauschen. Matrixprodukt: Element $(i,j)$ = Zeile $i$ von links $\\cdot$ Spalte $j$ von rechts (komponentenweise multiplizieren und summieren).\nSchritt 1 – Transponieren: $A^T = ${AT}$\nSchritt 2 – $A\\cdot A^T$ elementweise (Zeile mal Spalte):\n$(1,1) = ${a}\\cdot ${a}+${b}\\cdot ${b} = ${r11}$\n$(1,2) = ${a}\\cdot ${c}+${b}\\cdot ${d} = ${r12}$\n$(2,1) = ${c}\\cdot ${a}+${d}\\cdot ${b} = ${r21}$\n$(2,2) = ${c}\\cdot ${c}+${d}\\cdot ${d} = ${r22}$\nErgebnis: $A\\cdot A^T = ${R}$ (Hinweis: $A\\cdot A^T$ ist immer symmetrisch)`
     };
   }),
       (function(){
@@ -1325,10 +1338,10 @@ const DATA = [
     const A = bmatrix([[a,b],[c,d]]);
     const Inv = bmatrix(inv);
     return {
-      f:`Bestimme die Inverse von $A = ${A}$ mit dem Gauß-Jordan-Algorithmus.\nPrüfe kurz das Ergebnis.`,
-      h:"$[A|E]$ aufstellen, $A$ durch Zeilenumformungen zur Einheitsmatrix machen.",
+      f:`Bestimme die Inverse von $A = ${A}$.\nPrüfe kurz das Ergebnis.`,
+      h:"$A^{-1} = \\dfrac{1}{\\det A}\\begin{bmatrix}d & -b \\\\ -c & a\\end{bmatrix}$",
       l:`$A^{-1} = ${Inv}$`,
-      w:`$\\det(A) = ${a}\\cdot ${d} - ${b}\\cdot ${c} = ${det}$\n$A^{-1} = ${Inv}$\nProbe: $A\\cdot A^{-1} = E$ ✓`
+      w:`Formel (Inverse einer 2×2-Matrix): für $A = \\begin{bmatrix}a & b \\\\ c & d\\end{bmatrix}$ gilt $A^{-1} = \\dfrac{1}{\\det A}\\begin{bmatrix}d & -b \\\\ -c & a\\end{bmatrix}$\nDabei: $\\det A = ad-bc$ = Determinante (muss $\\neq 0$ sein, sonst nicht invertierbar). Es gilt $A\\cdot A^{-1} = E$ (Einheitsmatrix).\nSchritt 1 – Determinante: $\\det A = ${a}\\cdot ${d} - ${b}\\cdot ${c} = ${det}$\nSchritt 2 – Hauptdiagonale tauschen ($a\\leftrightarrow d$), Nebendiagonale negieren, durch $\\det$ teilen:\n$A^{-1} = \\dfrac{1}{${det}}${bmatrix([[d,-b],[-c,a]])} = ${Inv}$\nProbe: $A\\cdot A^{-1} = E = \\begin{bmatrix}1&0\\\\0&1\\end{bmatrix}$ ✓`
     };
   }),
       (function(){
@@ -1343,7 +1356,7 @@ const DATA = [
       f:`Gegeben $A=${A}$ und $B=${B}$. Berechne $A+B$ und $${k}\\cdot A$.`,
       h:"Addition elementweise, Skalarmultiplikation jedes Element.",
       l:`$A+B = ${Sum}$,  $${k}\\cdot A = ${KA}$`,
-      w:`$A+B = ${Sum}$\n$${k}\\cdot A = ${KA}$`
+      w:`Regeln: Matrizenaddition = elementweise addieren (nur bei gleicher Größe). Skalarmultiplikation = JEDES Element mit dem Faktor multiplizieren.\nSchritt 1 – Addition $A+B$ (jeweils gleiche Positionen addieren):\n$${bmatrix([[a1+"+"+b1,a2+"+"+b2],[a3+"+"+b3,a4+"+"+b4]])} = ${Sum}$\nSchritt 2 – Skalarmultiplikation $${k}\\cdot A$ (jedes Element mal $${k}$):\n$${bmatrix([[k+"\\\\cdot"+a1,k+"\\\\cdot"+a2],[k+"\\\\cdot"+a3,k+"\\\\cdot"+a4]])} = ${KA}$`
     };
   }),
       (function(){
@@ -1354,10 +1367,10 @@ const DATA = [
     const B = bmatrix([[b1,b2],[b3,b4]]);
     const R = bmatrix([[r11,r12],[r21,r22]]);
     return {
-      f:`Berechne $A\\cdot B$ für $A=${A}$ und $B=${B}$ (Falk-Schema / Zeile mal Spalte).`,
+      f:`Berechne $A\\cdot B$ für $A=${A}$ und $B=${B}$ (Zeile mal Spalte).`,
       h:"Element $(1,1) = $ Zeile 1$(A)\\cdot$Spalte 1$(B)$, usw.",
       l:`$A\\cdot B = ${R}$`,
-      w:`$A\\cdot B = \\begin{bmatrix}${a1}\\cdot ${b1}+${a2}\\cdot ${b3} & ${a1}\\cdot ${b2}+${a2}\\cdot ${b4} \\\\ ${a3}\\cdot ${b1}+${a4}\\cdot ${b3} & ${a3}\\cdot ${b2}+${a4}\\cdot ${b4}\\end{bmatrix}$\n$= ${R}$`
+      w:`Regel (Matrixmultiplikation „Zeile mal Spalte“): Element $(i,j)$ des Ergebnisses = Zeile $i$ von $A$ mal Spalte $j$ von $B$ (paarweise multiplizieren, dann addieren).\nSchritt für Schritt:\n$(1,1) = ${a1}\\cdot ${b1}+${a2}\\cdot ${b3} = ${r11}$\n$(1,2) = ${a1}\\cdot ${b2}+${a2}\\cdot ${b4} = ${r12}$\n$(2,1) = ${a3}\\cdot ${b1}+${a4}\\cdot ${b3} = ${r21}$\n$(2,2) = ${a3}\\cdot ${b2}+${a4}\\cdot ${b4} = ${r22}$\nErgebnis: $A\\cdot B = ${R}$\n(Achtung: $A\\cdot B \\neq B\\cdot A$ im Allgemeinen!)`
     };
   }),
     ]},
@@ -1386,7 +1399,7 @@ const DATA = [
       f:`Nebenbedingungen: $5A+4B\\leq 400$, $3A+6B\\leq 420$, $6A\\leq 360$, $A,B\\geq 0$.\nZielfunktion $G=${fc(c1)}A+${fc(c2)}B \\to $ Max.\nEckpunkte des zulässigen Bereichs: $(0/0),(60/0),(60/25),(40/50),(0/70)$.\nWelcher Punkt ist optimal?`,
       h:"Jeden Eckpunkt in die Zielfunktion einsetzen, größten Wert suchen.",
       l:`Optimum bei $(${best[0]}/${best[1]})$ mit Gewinn $G=${mNum(vals[bestIdx])}$.`,
-      w:`${listStr}\n$\\Rightarrow$ Optimum bei $(${best[0]}/${best[1]})$ mit $G=${mNum(vals[bestIdx])}$`
+      w:`Prinzip (Eckpunktverfahren): Das Optimum einer linearen Zielfunktion liegt immer in einem ECKPUNKT des zulässigen Bereichs. Also alle Eckpunkte in $G$ einsetzen und den größten Wert wählen.\nDabei: $G=${fc(c1)}A+${fc(c2)}B$ = Zielfunktion (Gewinn), $A,B$ = Produktionsmengen, Nebenbedingungen = Kapazitätsgrenzen\nEinsetzen aller Eckpunkte:\n${listStr}\nGrößter Wert $\\Rightarrow$ Optimum bei $(${best[0]}/${best[1]})$ mit $G=${mNum(vals[bestIdx])}$`
     };
   }),
       (function(){
@@ -1395,7 +1408,7 @@ const DATA = [
       f:`Formuliere die Nebenbedingung „${a} Maschinenstunden A + ${b} Maschinenstunden B $\\leq ${K}$“ als Gleichung mit Schlupfvariable.`,
       h:"Schlupfvariable macht aus $\\leq$ eine Gleichung.",
       l:`$${a}A + ${b}B + s = ${K}$`,
-      w:`$${a}A + ${b}B + s = ${K}$\n($s = $ ungenutzte Kapazität, $s \\geq 0$)`
+      w:`Prinzip (Schlupfvariable): Für den Simplex-Algorithmus müssen Ungleichungen ($\\leq$) in Gleichungen umgewandelt werden. Dazu addiert man eine Schlupfvariable $s \\geq 0$, die die ungenutzte Kapazität aufnimmt.\nUngleichung: $${a}A + ${b}B \\leq ${K}$\nMit Schlupfvariable: $${a}A + ${b}B + s = ${K}$\nBedeutung von $s$: $s = ${K} - ${a}A - ${b}B$ = ungenutzte Restkapazität. Ist $s=0$, ist die Kapazität voll ausgeschöpft.`
     };
   }),
       (function(){
@@ -1403,7 +1416,7 @@ const DATA = [
       f:"Beschreibe kurz, wann der Simplex-Algorithmus (Tableau-Methode) fertig ist / das Optimum erreicht ist.",
       h:"Blick auf die Zielfunktionszeile im Tableau.",
       l:"Sobald die Zielfunktionszeile keine negativen Werte mehr enthält.",
-      w:"Der Algorithmus ist fertig, sobald die Zielfunktionszeile im Simplex-Tableau\nkeine negativen Werte mehr enthält — dann ist das Optimum erreicht."
+      w:`Simplex-Algorithmus – Ablauf (Maximierung):\n1) Ungleichungen mit Schlupfvariablen in Gleichungen umwandeln, Starttableau aufstellen.\n2) Pivotspalte wählen: die Spalte mit dem NEGATIVSTEN Wert in der Zielfunktionszeile (dort ist der größte Zuwachs möglich).\n3) Pivotzeile wählen: kleinster nicht-negativer Quotient (rechte Seite / Pivotspalten-Element).\n4) Pivotschritt durchführen (Gauß-Umformung), wiederholen.\nAbbruchkriterium: Der Algorithmus ist FERTIG, sobald die Zielfunktionszeile KEINE negativen Werte mehr enthält — dann kann der Zielfunktionswert nicht weiter gesteigert werden $\\Rightarrow$ Optimum erreicht.`
     };
   }),
       (function(){
@@ -1414,7 +1427,7 @@ const DATA = [
       f:`Berechne die Achsenabschnitte der Nebenbedingung $${a}A+${b}B=${c}$ (für $A=0$ und für $B=0$).`,
       h:"Jeweils eine Variable $=0$ setzen und nach der anderen auflösen.",
       l:`Achsenabschnitte bei $(0/${yInt})$ und $(${xInt}/0)$.`,
-      w:`$A=0$: $${b}B=${c} \\Rightarrow B=${yInt}$\n$B=0$: $${a}A=${c} \\Rightarrow A=${xInt}$\n$\\Rightarrow$ Gerade schneidet die Achsen bei $(0/${yInt})$ und $(${xInt}/0)$`
+      w:`Prinzip (Achsenabschnitte für das Zeichnen der Nebenbedingungsgeraden): Um eine Gerade zu zeichnen, genügen 2 Punkte — am einfachsten die Schnittpunkte mit den Achsen.\nSchritt 1 – Schnittpunkt mit der $B$-Achse ($A=0$ setzen): $${b}B=${c} \\Rightarrow B = \\dfrac{${c}}{${b}} = ${yInt} \\Rightarrow$ Punkt $(0/${yInt})$\nSchritt 2 – Schnittpunkt mit der $A$-Achse ($B=0$ setzen): $${a}A=${c} \\Rightarrow A = \\dfrac{${c}}{${a}} = ${xInt} \\Rightarrow$ Punkt $(${xInt}/0)$\nErgebnis: Gerade durch $(0/${yInt})$ und $(${xInt}/0)$`
     };
   }),
       (function(){
@@ -1429,7 +1442,7 @@ const DATA = [
       f:`Eine Firma produziert Produkt A (Gewinn ${c1}€/Stück) und B (Gewinn ${c2}€/Stück).\nNebenbedingungen: $2A+4B\\leq 160$, $A+B\\leq 50$, $A,B\\geq 0$.\nEckpunkte: $(0/0),(50/0),(30/20),(0/40)$. Bestimme das Gewinnoptimum.`,
       h:`Alle Eckpunkte in $G=${c1}A+${c2}B$ einsetzen.`,
       l:`Optimum bei $(${best[0]}/${best[1]})$ mit Gewinn ${vals[bestIdx]}€.`,
-      w:`${listStr}\n$\\Rightarrow$ Optimum bei $(${best[0]}/${best[1]})$ mit Gewinn ${vals[bestIdx]}€`
+      w:`Prinzip (grafische lineare Optimierung, Eckpunktverfahren): Das Maximum liegt in einem Eckpunkt des zulässigen Bereichs $\\Rightarrow$ alle Eckpunkte in die Zielfunktion einsetzen.\nZielfunktion: $G = ${c1}A + ${c2}B$ (Gesamtgewinn), $A,B$ = produzierte Stückzahlen\nEinsetzen:\n${listStr}\nGrößter Wert $\\Rightarrow$ Optimum bei $(${best[0]}/${best[1]})$ mit Gewinn ${vals[bestIdx]}€`
     };
   }),
     ]},
