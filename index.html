@@ -173,9 +173,20 @@
   .theory-block h4:first-of-type{margin-top:0;}
   .formula-box{
     background:#F5F4EF;border:1px solid var(--line);border-radius:10px;
-    padding:14px 16px;font-family:var(--mono);font-size:13px;line-height:1.85;
-    color:var(--ink);white-space:pre-line;margin-bottom:10px;
+    padding:4px 16px;font-family:var(--mono);font-size:13px;
+    color:var(--ink);margin-bottom:10px;
   }
+  .def-list{display:flex;flex-direction:column;}
+  .def-row{
+    padding:10px 0;border-bottom:1px solid var(--line);
+    display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;
+  }
+  .def-row:last-child{border-bottom:none;}
+  .def-label{
+    font-family:var(--sans);font-size:11.5px;font-weight:700;color:var(--gold);
+    flex-shrink:0;white-space:nowrap;
+  }
+  .def-text{font-family:var(--mono);font-size:13px;color:var(--ink);line-height:1.65;}
   .example-box{
     background:#FBFCFF;border:1px solid var(--line);border-left:4px solid var(--ink);
     border-radius:10px;padding:14px 16px;margin-bottom:10px;
@@ -213,10 +224,10 @@
   .session-title .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);}
   .session-title h2{font-family:var(--serif);font-size:22px;margin:4px 0 0;font-weight:600;}
 
-  .card-stage{perspective:1600px;max-width:640px;margin:0 auto;}
+  .card-stage{perspective:1600px;max-width:720px;margin:0 auto;}
   .flipcard{
-    position:relative;min-height:340px;
-    transform-style:preserve-3d;transition:transform .55s cubic-bezier(.4,.2,.2,1);
+    position:relative;min-height:420px;
+    transform-style:preserve-3d;transition:transform .55s cubic-bezier(.4,.2,.2,1), min-height .25s ease;
   }
   .flipcard.flipped{transform:rotateY(180deg);}
   .face{
@@ -394,10 +405,15 @@
   .formeln-search:focus{outline:2px solid var(--gold);outline-offset:1px;}
   .formeln-chapter h2{font-family:var(--serif);font-size:19px;margin:26px 0 10px;color:var(--ink);}
   .formeln-chapter h2:first-child{margin-top:0;}
-  .formeln-sub{margin-bottom:8px;}
-  .formeln-sub h3{font-family:var(--serif);font-size:14.5px;margin:14px 0 6px;color:var(--ink-soft);}
+  .formeln-sub{
+    margin-bottom:16px;padding:18px 20px 20px;background:var(--card);
+    border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
+  }
+  .formeln-sub h3{font-family:var(--serif);font-size:14.5px;margin:0 0 8px;color:var(--ink);}
   .formeln-sub.hidden{display:none;}
   .formeln-chapter.hidden{display:none;}
+  .fs-block-title{font-family:var(--serif);font-size:12.5px;font-weight:600;margin:14px 0 6px;color:var(--ink-soft);}
+  .fs-block-title:first-of-type{margin-top:4px;}
 
   @media (max-width:560px){
     .face-body{font-size:14.5px;}
@@ -1647,7 +1663,7 @@ function openTopic(ch, sub){
 
   let blocksHtml = (t.blocks||[]).map(b => `
     <h4>${b.h}</h4>
-    <div class="formula-box">${escapeHtml(b.f)}</div>
+    <div class="formula-box">${buildDefListHtml(b.f)}</div>
   `).join("");
 
   let exampleHtml = t.example ? `
@@ -1794,6 +1810,29 @@ function setRechenwegHtml(el, text){
 }
 
 /* =====================================================================
+   FORMELSAMMLUNG / THEORIE: strukturierte Definitionsliste
+   Statt eines einzigen Fließtext-Blocks mit Zeilenumbrüchen wird jede
+   Zeile zu einer eigenen, klar abgegrenzten Zeile mit Trennlinie. Erkennt
+   optional ein "Label:" am Zeilenanfang (z.B. "Rangfolge:", "Zinsen pro
+   Jahr:") und hebt es hervor.
+   ===================================================================== */
+function buildDefListHtml(text){
+  const lines = String(text || "").split("\n").map(l => l.trim()).filter(l => l.length > 0);
+  if(!lines.length) return "";
+  let html = '<div class="def-list">';
+  lines.forEach(line => {
+    const m = line.match(/^([A-ZÄÖÜ][\wÄÖÜäöüß .\/()-]{1,40}?):\s*(.*)$/);
+    if(m){
+      html += `<div class="def-row"><span class="def-label">${escapeHtml(m[1])}:</span><span class="def-text">${escapeHtml(m[2])}</span></div>`;
+    } else {
+      html += `<div class="def-row"><span class="def-text">${escapeHtml(line)}</span></div>`;
+    }
+  });
+  html += "</div>";
+  return html;
+}
+
+/* =====================================================================
    PRACTICE SESSION
    ===================================================================== */
 let session = { cards:[], index:0, title:"", eyebrow:"", results:[], returnTo:"overview" };
@@ -1893,6 +1932,7 @@ function openPractice(){
   document.getElementById("btnToMap").addEventListener("click", closePractice);
   document.getElementById("btnHint").addEventListener("click", ()=>{
     document.getElementById("hintBox").classList.toggle("show");
+    resizeFlipcard();
   });
   document.getElementById("btnFlip").addEventListener("click", ()=>{
     document.getElementById("flipcard").classList.add("flipped");
@@ -1905,6 +1945,7 @@ function openPractice(){
     const btn = document.getElementById("btnRechenweg");
     const nowShown = box.classList.toggle("show");
     btn.textContent = nowShown ? "🧮 Rechenweg verbergen" : "🧮 Rechenweg anzeigen";
+    resizeFlipcard();
   });
   document.getElementById("btnAgain").addEventListener("click", ()=>judge("again"));
   document.getElementById("btnGood").addEventListener("click", ()=>judge("good"));
@@ -1956,6 +1997,37 @@ function renderCard(){
   btn.textContent = alwaysOn ? "🧮 Rechenweg verbergen" : "🧮 Rechenweg anzeigen";
 
   renderDots();
+  resizeFlipcard();
+}
+
+/* =====================================================================
+   Karte automatisch auf die benötigte Höhe bringen, statt intern zu
+   scrollen. Da .face per position:absolute auf die Höhe von .flipcard
+   gezwungen wird, messen wir den tatsächlich benötigten Platz (inkl.
+   scrollHeight der Inhaltsbereiche) für Vorder- und Rückseite und setzen
+   die größere der beiden als neue min-height – gedeckelt, damit die
+   Karte nie über den Viewport hinauswächst.
+   ===================================================================== */
+function resizeFlipcard(){
+  const flipcard = document.getElementById("flipcard");
+  if(!flipcard) return;
+  const measureFace = (face) => {
+    if(!face) return 0;
+    const cs = getComputedStyle(face);
+    let total = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+    Array.from(face.children).forEach(child => {
+      const ccs = getComputedStyle(child);
+      const h = child.classList.contains("face-body") ? child.scrollHeight : child.offsetHeight;
+      total += h + parseFloat(ccs.marginTop||0) + parseFloat(ccs.marginBottom||0);
+    });
+    return total;
+  };
+  const front = flipcard.querySelector(".face.front");
+  const back = flipcard.querySelector(".face.back");
+  const needed = Math.max(measureFace(front), measureFace(back));
+  const maxH = window.innerHeight * 0.82;
+  const finalH = Math.min(Math.max(needed, 420), Math.max(maxH, 420));
+  flipcard.style.minHeight = finalH + "px";
 }
 
 function judge(result){
@@ -2013,7 +2085,7 @@ function renderFormeln(){
     let subsHtml = "";
     ch.subs.forEach(sub=>{
       const t = sub.theory;
-      const blocksHtml = (t.blocks||[]).map(b=>`<div class="formula-box">${escapeHtml(b.f)}</div>`).join("");
+      const blocksHtml = (t.blocks||[]).map(b=>`<h4 class="fs-block-title">${b.h}</h4><div class="formula-box">${buildDefListHtml(b.f)}</div>`).join("");
       const exampleHtml = t.example ? `<div class="example-box"><div class="ex-title">${escapeHtml(t.example.title)}</div><div class="ex-body">${escapeHtml(t.example.body)}</div></div>` : "";
       const merkeHtml = t.merke ? `<div class="merksatz"><b>Merke:</b> ${escapeHtml(t.merke)}</div>` : "";
       const searchText = (sub.title+" "+t.intro+" "+(t.blocks||[]).map(b=>b.h+" "+b.f).join(" ")+" "+(t.example?t.example.title+" "+t.example.body:"")).toLowerCase();
@@ -2053,6 +2125,9 @@ document.getElementById("navFormelsammlung").addEventListener("click", ()=>{
 
 /* init */
 initSettingsToggle();
+window.addEventListener("resize", ()=>{
+  if(document.getElementById("flipcard")) resizeFlipcard();
+});
 renderOverview();
 </script>
 </body>
